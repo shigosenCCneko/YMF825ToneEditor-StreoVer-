@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.EnvelopeViewerController">
+   <center>
+      <Pane prefHeight="300.0" prefWidth="480.0" BorderPane.alignment="CENTER">
+         <children>
+            <RadioButton fx:id="OP_1" layoutX="10.0" layoutY="12.0" mnemonicParsing="false" onAction="#opSelectButton" prefHeight="14.0" prefWidth="40.0" selected="true" text="OP1" textFill="#75f542">
+               <font>
+                  <Font size="10.0" />
+               </font>
+            </RadioButton>
+            <RadioButton fx:id="OP_2" layoutX="60.0" layoutY="12.0" mnemonicParsing="false" onAction="#opSelectButton" prefHeight="18.0" prefWidth="40.0" selected="true" text="OP2" textFill="#e31010">
+               <font>
+                  <Font size="10.0" />
+               </font>
+            </RadioButton>
+            <RadioButton fx:id="OP_3" layoutX="110.0" layoutY="12.0" mnemonicParsing="false" onAction="#opSelectButton" prefHeight="14.0" prefWidth="40.0" selected="true" text="OP3" textFill="#164fea">
+               <font>
+                  <Font size="10.0" />
+               </font>
+            </RadioButton>
+            <RadioButton fx:id="OP_4" layoutX="160.0" layoutY="12.0" mnemonicParsing="false" onAction="#opSelectButton" prefHeight="14.0" prefWidth="40.0" selected="true" text="OP4">
+               <font>
+                  <Font size="10.0" />
+               </font>
+            </RadioButton>
+            <Slider fx:id="noteOffPos" layoutX="254.0" layoutY="12.0" max="1000.0" prefHeight="17.0" prefWidth="145.0" />
+            <RadioButton fx:id="rdbtnX" layoutX="11.0" layoutY="271.0" mnemonicParsing="false" onAction="#set3XView" prefHeight="14.0" prefWidth="40.0" text="X3">
+               <font>
+                  <Font size="10.0" />
+               </font>
+            </RadioButton>
+            <Slider fx:id="tracePos" layoutX="90.0" layoutY="270.0" max="800.0" />
+            <Slider fx:id="tone_slider" layoutX="270.0" layoutY="270.0" />
+            <Label layoutX="56.0" layoutY="271.0" text="Pos">
+               <font>
+                  <Font size="10.0" />
+               </font></Label>
+            <Label layoutX="240.0" layoutY="270.0" text="note">
+               <font>
+                  <Font size="10.0" />
+               </font></Label>
+            <Label layoutX="230.0" layoutY="12.0" text="PR">
+               <font>
+                  <Font size="10.0" />
+               </font></Label>
+            <RadioButton fx:id="toneTraceRadioButton" layoutX="410.0" layoutY="12.0" mnemonicParsing="false" onAction="#setTraceMode" text="Trace">
+               <font>
+                  <Font size="10.0" />
+               </font>
+            </RadioButton>
+            <Canvas fx:id="canvas" height="234.0" layoutX="18.0" layoutY="33.0" width="617.0" />
+         </children>
+      </Pane>
+   </center>
+</BorderPane>

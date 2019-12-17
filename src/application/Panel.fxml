@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import CustomComponent.MySlider?>
+<?import CustomComponent.OperatorPanel?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<!--  ?import myPanel.OperatorPanel? -->
+
+<VBox prefHeight="800.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.PanelController">
+   <children>
+   <fx:include fx:id="menuField" source="menuField.fxml" />
+
+      <HBox prefHeight="770.0" prefWidth="500.0">
+         <children>
+            <VBox accessibleText="a" prefHeight="750.0" prefWidth="480.0">
+               <children>
+                  <HBox prefHeight="380.0" prefWidth="480.0">
+                     <children>
+
+                        <Pane prefHeight="378.0" prefWidth="30.0">
+                           <children>
+                              <MySlider fx:id="feedBack1" accessibleText="FB1,0,7,0" layoutX="5.0" layoutY="9.0" prefHeight="100.0" />
+                              <MySlider fx:id="sliderLFO" accessibleText="LFO,0,3,0" layoutX="5.0" layoutY="130.0" prefHeight="80.0" />
+                              <MySlider fx:id="sliderBO" accessibleText="BO,0,3,0" layoutX="5.0" layoutY="220.0" prefHeight="80.0" />
+                           </children>
+                        </Pane>
+
+<!-- ************************************************************************* -->
+ <!--
+
+
+               			<Pane fx:id="dummy1" prefHeight="390.0" prefWidth="220.0" style="-fx-background-color: GRAY;" />
+			           	<Pane prefWidth="9.0" />
+                        <Pane fx:id="dummy2" layoutX="5.0" prefHeight="390.0" prefWidth="220.0" style="-fx-background-color: GRAY;" />
+-->
+			           	<OperatorPanel fx:id="operator1" AccessibleText="■■ OP1 ■■,GREEN,0" prefWidth="220.0" />
+			           	<Pane prefWidth="9.0" />
+                        <OperatorPanel fx:id="operator2" AccessibleText="■■ OP2 ■■,RED,1" prefWidth="220.0" />
+
+
+
+ <!-- ************************************************************************* -->
+                     </children>
+                  </HBox>
+                  <Pane prefHeight="9.0" />
+                  <Separator prefWidth="200.0" />
+                  <HBox fx:id="fourOpBox" prefHeight="390.0" prefWidth="480.0">
+                     <children>
+                        <Pane prefHeight="380.0" prefWidth="30.0">
+                           <children>
+                              <MySlider fx:id="feedBack2" accessibleText="FB2,0,7,0" layoutX="5.0" layoutY="60.0" prefHeight="100.0" />
+                           </children>
+                        </Pane>
+ <!-- ************************************************************************* -->
+					<!--
+                        <Pane fx:id="dummy3" prefHeight="390.0" prefWidth="220.0" style="-fx-background-color: GRAY;" />
+			           	<Pane prefWidth="9.0" />
+                        <Pane fx:id="dummy4" layoutX="5.0" prefHeight="390.0" prefWidth="220.0" style="-fx-background-color: GRAY;" />
+					-->
+
+			           	<OperatorPanel fx:id="operator3" AccessibleText="■■ OP3 ■■,BLUE,2" prefWidth="220.0" />
+   			           	<Pane prefWidth="9.0" />
+                        <OperatorPanel fx:id="operator4" AccessibleText="■■ OP4 ■■,BLACK,3" prefWidth="220.0" />
+
+ <!-- **************************************************************************** -->
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="624.0" prefWidth="200.0">
+               <children>
+                  <CheckBox fx:id="envelopeViewer" mnemonicParsing="false" onAction="#envelopeViewerShow" prefHeight="42.0" prefWidth="126.0" text="Envelope Viewer">
+                     <font>
+                        <Font size="11.0" />
+                     </font></CheckBox>
+                  <Separator prefHeight="26.0" prefWidth="209.0" />
+                  <ComboBox fx:id="toneSelectBox" onAction="#changeTone" prefHeight="26.0" prefWidth="160.0" promptText="User" style="-fx-font-size: 10;" stylesheets="@application.css" />
+                  <Separator prefHeight="40.0" prefWidth="178.0" />
+                  <ComboBox fx:id="channelSelectBox" onAction="#changeChannel" prefHeight="26.0" prefWidth="86.0" promptText="CH1" style="-fx-font-size: 10;" stylesheets="@application.css" />
+                  <Separator prefHeight="36.0" prefWidth="178.0" />
+                  <Button fx:id="changePairButton" mnemonicParsing="false" onAction="#changePareChannel" prefHeight="20.0" prefWidth="124.0" text="Cahnge Pair Tone">
+                     <font>
+                        <Font size="9.0" />
+                     </font></Button>
+                  <Separator prefHeight="28.0" prefWidth="178.0" />
+                  <ComboBox fx:id="AlgoSelectBox" onAction="#changeAlgo" prefHeight="110.0" prefWidth="170.0" />
+                  <Separator prefHeight="38.0" prefWidth="178.0" />
+                  <Button fx:id="copyToneButton" mnemonicParsing="false" onAction="#copyTone" prefHeight="20.0" prefWidth="140.0" text="Copy to Memory">
+                     <font>
+                        <Font size="9.0" />
+                     </font></Button>
+                  <Separator prefHeight="13.0" prefWidth="178.0" />
+                  <Button fx:id="swapToneButton" mnemonicParsing="false" onAction="#swapTone" prefHeight="20.0" prefWidth="140.0" text="Swap Memory">
+                     <font>
+                        <Font size="9.0" />
+                     </font></Button>
+                  <Separator prefHeight="39.0" prefWidth="178.0" />
+                  <CheckBox fx:id="leftParamSel" mnemonicParsing="false" onAction="#leftParamOnly" prefHeight="32.0" prefWidth="141.0" text="Left Parameter Only">
+                     <font>
+                        <Font size="9.0" />
+                     </font></CheckBox>
+                  <Separator prefHeight="22.0" prefWidth="178.0" />
+                  <Label prefHeight="15.0" prefWidth="70.0" text="EEPROM No">
+                     <font>
+                        <Font size="9.0" />
+                     </font></Label>
+                  <HBox alignment="CENTER" prefHeight="38.0" prefWidth="178.0">
+                     <children>
+                        <Button fx:id="eepchIncButton" mnemonicParsing="false" onAction="#incEepCh" prefHeight="20.0" prefWidth="30.0" text="Inc">
+                           <font>
+                              <Font size="9.0" />
+                           </font></Button>
+                        <TextField fx:id="eepch" prefHeight="26.0" prefWidth="47.0" />
+                        <Button fx:id="eepchDecButton" mnemonicParsing="false" onAction="#decEepCh" prefHeight="20.0" prefWidth="33.0" text="Dec">
+                           <font>
+                              <Font size="9.0" />
+                           </font></Button>
+                     </children>
+                  </HBox>
+                  <Button fx:id="eepReadButton" mnemonicParsing="false" onAction="#eepromReadData" prefHeight="20.0" prefWidth="140.0" text="EEPROM Read">
+                     <font>
+                        <Font size="9.0" />
+                     </font></Button>
+                  <Separator prefHeight="20.0" prefWidth="178.0" />
+                  <Button fx:id="eepWeiteButton" mnemonicParsing="false" onAction="#eepromWrite" prefHeight="20.0" prefWidth="140.0" text="EEPROM Write">
+                     <font>
+                        <Font size="9.0" />
+                     </font></Button>
+                  <Separator prefHeight="31.0" prefWidth="178.0" />
+                  <Button fx:id="resetLeft" mnemonicParsing="false" onAction="#leftParamReset" prefHeight="20.0" prefWidth="140.0" text="Reset Left DT_TL">
+                     <font>
+                        <Font size="9.0" />
+                     </font></Button>
+                  <Separator prefHeight="20.0" prefWidth="178.0" />
+                  <Button fx:id="leftDtInc" mnemonicParsing="false" onAction="#leftDtChange" prefHeight="20.0" prefWidth="140.0" text="Left DT inc">
+                     <font>
+                        <Font size="9.0" />
+                     </font></Button>
+                  <Separator prefHeight="20.0" prefWidth="178.0" />
+                  <Button fx:id="leftDtTlChange" mnemonicParsing="false" onAction="#leftDtTlChange" prefHeight="20.0" prefWidth="140.0" text="Left DT_TL Change">
+                     <font>
+                        <Font size="9.0" />
+                     </font></Button>
+                  <Separator prefHeight="30.0" prefWidth="178.0" />
+                  <Button fx:id="readFromTextButton" mnemonicParsing="false" onAction="#readFromText" prefHeight="20.0" prefWidth="140.0" text="Read from Text">
+                     <font>
+                        <Font size="9.0" />
+                     </font></Button>
+                  <Separator prefHeight="20.0" prefWidth="178.0" />
+                  <Button fx:id="writeToTextButton" mnemonicParsing="false" onAction="#writeToText" prefHeight="20.0" prefWidth="140.0" text="Write to Text">
+                     <font>
+                        <Font size="9.0" />
+                     </font></Button>
+                  <Separator prefHeight="25.0" prefWidth="178.0" />
+                  <CheckBox fx:id="sysExSelect" mnemonicParsing="false" onAction="#sysExSelect" prefHeight="18.0" prefWidth="88.0" text="SysEx">
+                     <font>
+                        <Font size="9.0" />
+                     </font></CheckBox>
+                  <Separator prefWidth="200.0" />
+                  <CheckBox fx:id="forDomino" mnemonicParsing="false" onAction="#forDomino" prefHeight="14.0" prefWidth="87.0" text="for Domino">
+                     <font>
+                        <Font size="9.0" />
+                     </font></CheckBox>
+               </children>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></VBox>
+         </children>
+      </HBox>
+      <HBox prefHeight="50.0" prefWidth="394.0">
+         <children>
+            <Pane prefHeight="32.0" prefWidth="744.0">
+               <children>
+                  <TextField fx:id="toneDataText" layoutX="7.0" layoutY="6.0" prefHeight="25.0" prefWidth="705.0">
+                     <font>
+                        <Font size="9.0" />
+                     </font></TextField>
+               </children></Pane>
+         </children>
+      </HBox>
+   </children>
+</VBox>

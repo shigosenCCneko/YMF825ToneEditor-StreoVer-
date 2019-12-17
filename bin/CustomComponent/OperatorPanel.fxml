@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import CustomComponent.MySlider?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<fx:root prefHeight="365.0" prefWidth="220.0" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+
+	<children>
+	
+          <Label fx:id="operatorName" layoutX="51.0" text="CustomSlider Test" textAlignment="CENTER" />
+	
+         <MySlider fx:id="sliderAtk" AccessibleText="Atk,1,15,2" accessibleText="Atk,0,15,0" layoutX="14.0" layoutY="20.0" />
+         <MySlider fx:id="sliderDec" AccessibleText="Dec,0,50,25" accessibleText="Dec,0,15,0" layoutX="44.0" layoutY="20.0" />
+         <MySlider fx:id="sliderSus" AccessibleText="Sus" accessibleText="SR,0,15,0" layoutX="74.0" layoutY="20.0" />
+         <Label fx:id="valueLabel" layoutX="180.0" layoutY="223.0" prefHeight="17.0" prefWidth="21.0" text="0" />
+         <MySlider fx:id="sliderSl" accessibleText="SL,0,15,0" layoutX="104.0" layoutY="20.0" />
+         <MySlider fx:id="sliderRel" accessibleText="Rel,0,15,0" layoutX="134.0" layoutY="20.0" />
+         <MySlider fx:id="sliderMul" accessibleText="Mul,0,15,0" layoutX="164.0" layoutY="20.0" />
+         <MySlider fx:id="sliderDT" accessibleText="DT,0,7,0" layoutX="190.0" layoutY="20.0" prefHeight="97.0" prefWidth="31.0" />
+         <MySlider fx:id="sliderTLV" accessibleText="TLV,0,63,0" layoutX="14.0" layoutY="195.0" />
+         <MySlider fx:id="sliderKSL" accessibleText="KSL,0,3,0" layoutX="44.0" layoutY="195.0" prefHeight="97.0" prefWidth="31.0" />
+         <MySlider fx:id="sliderDAM" accessibleText="DAM,0,3,0" layoutX="104.0" layoutY="270.0" prefHeight="90.0" prefWidth="38.0" />
+         <MySlider fx:id="sliderDVB" accessibleText="DVB,0,3,0" layoutX="142.0" layoutY="270.0" prefHeight="90.0" prefWidth="38.0" />
+         <RadioButton fx:id="ksrRadioButton" layoutX="44.0" layoutY="315.0" mnemonicParsing="false" onAction="#ksrSelect" text="KSR">
+         <font>
+            <Font size="11.0" />
+         </font></RadioButton>
+         <RadioButton layoutX="44.0" layoutY="335.0" mnemonicParsing="false" onAction="#xofSelect" text="XOF" fx:id="xofRadioButton">
+         <font>
+            <Font size="11.0" />
+         </font></RadioButton>
+         <RadioButton fx:id="eamRadioButton" layoutX="92.0" layoutY="250.0" mnemonicParsing="false" onAction="#eamSelect" text="EAM">
+         <font>
+            <Font size="11.0" />
+         </font></RadioButton>
+         <RadioButton fx:id="evbRadioButton" layoutX="142.0" layoutY="250.0" mnemonicParsing="false" onAction="#evbSelect" text="EVB">
+         <font>
+            <Font size="11.0" />
+         </font></RadioButton>
+         <ComboBox fx:id="waveSelect" layoutX="85.0" layoutY="210.0" onAction="#selectedWaveform" prefHeight="25.0" prefWidth="81.0" />
+	</children>
+	
+</fx:root>

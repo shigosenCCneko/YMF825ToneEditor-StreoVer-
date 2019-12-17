@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.layout.HBox?>
+
+<HBox fx:id="menuBarField" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MenuFieldController">
+	<MenuBar style="-fx-font-size: 12;">
+        <menus>
+          <Menu mnemonicParsing="false" text="ToneSet">
+            <items>
+              <MenuItem fx:id="loadToneSet" mnemonicParsing="false" onAction="#loadToneSet" text="Load Tone Set" />
+                  <MenuItem fx:id="saveToneSet" mnemonicParsing="false" onAction="#saveToneSet" text="Save Tone Set" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="deviceToneSet" mnemonicParsing="false" onAction="#deviceToneSet" text="Load from Device" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Tone">
+            <items>
+              <MenuItem fx:id="loadTone" mnemonicParsing="false" onAction="#loadTone" text="Load Tone " />
+                  <MenuItem fx:id="saveTone" mnemonicParsing="false" onAction="#saveTone" text="Save Tone " />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="deviceTone" mnemonicParsing="false" onAction="#deviceTone" text="Load from Device" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem fx:id="copy12to34" mnemonicParsing="false" onAction="#copy12to34" text="Copy (1,2)to(3,4)" />
+                  <MenuItem fx:id="copy12to34clear" mnemonicParsing="false" onAction="#copy12to34Clear" text="Copy (1,2)to(3,4)Clear" />
+                  <MenuItem fx:id="copy12to23" mnemonicParsing="false" onAction="#copy12to23" text="Copy (1,2)to(2,3)" />
+                  <MenuItem fx:id="copy1to234" mnemonicParsing="false" onAction="#copy1to234" text="Copy (1)to(2,3,4)" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="viewSoftModulation" mnemonicParsing="false" onAction="#viewSoftwareModulation" text="View Software Modularion Pattern" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="reset" mnemonicParsing="false" onAction="#resetYMF825" text="Reset" />
+            </items>
+          </Menu>
+            <Menu mnemonicParsing="false" text="Mode">
+              <items>
+                <MenuItem fx:id="monoMode" mnemonicParsing="false" onAction="#monoMode" text="Mono" />
+                  <MenuItem fx:id="polyMode" mnemonicParsing="false" onAction="#polyMode" text="Poly" />
+                  <MenuItem fx:id="d8polyMode" mnemonicParsing="false" onAction="#d8polyMode" text="D-Poly8" />
+              </items>
+            </Menu>
+        </menus>
+      </MenuBar>
+</HBox>
