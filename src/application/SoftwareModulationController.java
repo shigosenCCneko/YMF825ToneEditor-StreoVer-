@@ -223,6 +223,8 @@ public class SoftwareModulationController implements Observer {
 	    	});
 
 		g = canvas.getGraphicsContext2D();
+		changeChannel();
+		drawLine();
 
 	}
 
