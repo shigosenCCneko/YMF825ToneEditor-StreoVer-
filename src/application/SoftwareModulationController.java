@@ -324,7 +324,7 @@ public class SoftwareModulationController implements Observer {
 
 
 	private void changeTable(int i){
-System.out.println("i");
+
 		int no = -1;
 		switch(i){
 

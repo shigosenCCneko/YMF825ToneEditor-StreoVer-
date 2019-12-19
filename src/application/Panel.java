@@ -49,7 +49,7 @@ public class Panel extends Application
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
         	@Override
         	public void handle(WindowEvent t) {
-        		   System.out.println("window close");
+        		  //System.out.println("window close");
         		   
         		   
       		   Alert alert = new Alert(AlertType.NONE,"",ButtonType.OK,

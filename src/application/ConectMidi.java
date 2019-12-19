@@ -157,7 +157,6 @@ public class ConectMidi {
 	 */
 
 	public synchronized void sys_exmes_recv(byte[] buf){
-		//byte[] buff = new byte[30];
 		int p = 0;
 		for(int i = 1;i < 61;i+=2){
 			midiExmesBuff[p++] = (byte) ((buf[i]<<4)+buf[i+1]);
@@ -293,8 +292,8 @@ public class ConectMidi {
 		}
 
 
-		System.out.println(midiIn);
-		System.out.println(midiOut);
+	//	System.out.println(midiIn);
+	//	System.out.println(midiOut);
 
 		midiInput = devices.get(midiIn);
 		midiOutput = devices.get(midiOut);
@@ -330,7 +329,7 @@ public class ConectMidi {
 	
 	
 	public void close() {
-		System.out.println("close midi device");
+		//System.out.println("close midi device");
 		midiReceivTransmitter.close();
 		midiSendReceiver.close();
 		midiInput.close();
@@ -341,7 +340,6 @@ public class ConectMidi {
 
 		byte buff[] = new byte[12];
 
-//System.out.println("command=" + command + " ch=" + ch + " dat1=" + dat1 + " dat2=" + dat2);
 
 
 		buff[0] = (byte)0xf0;
@@ -389,20 +387,12 @@ public class ConectMidi {
 			midiInDeviceName = properties.getProperty("midiInDeviceName");
 			midiOutDeviceName = properties.getProperty("midiOutDeviceName");
 
-
+			istream.close();
 		}catch(IOException e){
 			e.printStackTrace();
 		}
-
+		
 	}
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	
 	public void left_dt_add(int ch){

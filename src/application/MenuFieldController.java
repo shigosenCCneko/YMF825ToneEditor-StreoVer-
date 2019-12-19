@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 import DataClass.Ymf825ToneData;
 import MyEvent.MyDataEvent;
@@ -48,7 +50,7 @@ public class MenuFieldController implements MyDataListener{
 	FXMLLoader softModuLoader;
 	Parent		softModuRoot;
 	Stage	    softModuEditor;
-	
+	String workDir;
 
 public MenuFieldController() throws IOException{
 	softModuLoader = new FXMLLoader(getClass().getResource("SoftwareModulation.fxml"));
@@ -68,6 +70,21 @@ public MenuFieldController() throws IOException{
 		toneData = Ymf825ToneData.getInstance();
 	//	toneData.addListener(this);
 	
+		
+		
+		Properties properties = new Properties();
+
+			try{
+				InputStream istream = new FileInputStream("ymf825.properties");
+				properties.load(istream);
+				workDir =  properties.getProperty("workDir");
+
+				istream.close();
+			}catch(IOException e){
+				e.printStackTrace();
+			}
+
+		
 	}
 
 	
@@ -79,8 +96,14 @@ public MenuFieldController() throws IOException{
 		fileChooser.getExtensionFilters().addAll(
 				new FileChooser.ExtensionFilter("SDS", "*.sds"),
 		        new FileChooser.ExtensionFilter("ALL", "*.*"));
-		fileChooser.setInitialDirectory(
-		        		new File(System.getProperty("user.dir"))); 
+		
+		File dir = new File(workDir);
+		if(dir.exists() == false) {
+			dir = new File(System.getProperty("user.home"));
+		}	
+		fileChooser.setInitialDirectory(dir); 
+		
+		
         File file = fileChooser.showOpenDialog(null);
 	
 		if(file != null) {		
@@ -110,8 +133,14 @@ public MenuFieldController() throws IOException{
 		fileChooser.setTitle("Save Tone Set");
 		fileChooser.getExtensionFilters().addAll(
 		        new FileChooser.ExtensionFilter("SDS", "*.sds"));
-		fileChooser.setInitialDirectory(
-		   		new File(System.getProperty("user.dir"))); 
+		
+ 
+		
+		File dir = new File(workDir);
+		if(dir.exists() == false) {
+			dir = new File(System.getProperty("user.home"));
+		}	
+		fileChooser.setInitialDirectory(dir); 
 		File file = fileChooser.showSaveDialog(null);
 
 		if(file != null) {
@@ -152,14 +181,19 @@ public MenuFieldController() throws IOException{
 
 	
 	@FXML void loadTone() {
-		System.out.println("Load tone ");
+		//System.out.println("Load tone ");
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Load Tone");
 		fileChooser.getExtensionFilters().addAll(
 				new FileChooser.ExtensionFilter("SDS", "*.sd1"),
 		        new FileChooser.ExtensionFilter("ALL", "*.*"));
-		fileChooser.setInitialDirectory(
-		        		new File(System.getProperty("user.dir"))); 
+
+		File dir = new File(workDir);
+		if(dir.exists() == false) {
+			dir = new File(System.getProperty("user.home"));
+		}	
+		fileChooser.setInitialDirectory(dir); 
+		
         File file = fileChooser.showOpenDialog(null);
 	
 		if(file != null) {		
@@ -178,7 +212,6 @@ public MenuFieldController() throws IOException{
 				bis.close();
 				
 			} catch (IOException e) {
-				// TODO 自動生成された catch ブロック
 				e.printStackTrace();
 			}
 		}
@@ -190,8 +223,12 @@ public MenuFieldController() throws IOException{
 		fileChooser.setTitle("Save Tone");
 		fileChooser.getExtensionFilters().addAll(
 		        new FileChooser.ExtensionFilter("SDS", "*.sd1"));
-		fileChooser.setInitialDirectory(
-		   		new File(System.getProperty("user.dir"))); 
+		
+		File dir = new File(workDir);
+		if(dir.exists() == false) {
+			dir = new File(System.getProperty("user.home"));
+		}	
+		fileChooser.setInitialDirectory(dir); 
 		File file = fileChooser.showSaveDialog(null);
 
 		if(file != null) {
