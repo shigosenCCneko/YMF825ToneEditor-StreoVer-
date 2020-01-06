@@ -56,6 +56,7 @@ public class Panel extends Application
       				   									 ButtonType.CANCEL);
       		   alert.setTitle("終了");
       		   alert.getDialogPane().setContentText( "終了してもよろしいですか？" );
+      		   ((Stage) alert.getDialogPane().getScene().getWindow()).setAlwaysOnTop(true);
       		   
       		 ButtonType              button  = alert.showAndWait().orElse( ButtonType.CANCEL );      		
       		 if(button.getButtonData() != ButtonData.OK_DONE) {
@@ -72,6 +73,7 @@ public class Panel extends Application
 
         primaryStage.setScene( scene );
         primaryStage.show();
+        
         
 
  

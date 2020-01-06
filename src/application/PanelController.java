@@ -111,12 +111,14 @@ public class PanelController implements MyDataListener , Observer{
 
 			envelopeLoader = new FXMLLoader(getClass().getResource("envelopeViewer.fxml"));
 			envelopeRoot = (Parent)envelopeLoader.load();
-	
 			envelopeEditor	= new Stage();
 			envelopeEditor.setScene(new Scene(envelopeRoot));
 			envelopeEditor.setResizable(false);		//リサイズ不可
 			envelopeEditor.setAlwaysOnTop(true);
 			envelopeEditor.setTitle("Envelope Viewer");
+			envelopeEditor.setOnCloseRequest((e) -> {
+			    e.consume(); // consume()でEventをストップ
+			});
 		}
 
 
@@ -177,6 +179,7 @@ public class PanelController implements MyDataListener , Observer{
 			
 			Ymf825ToneData.getInstance().attach(this);
 
+			forDomino.setVisible(false);
 			setPanel();
 			parent = this;
 		}
@@ -197,7 +200,7 @@ public class PanelController implements MyDataListener , Observer{
 				currentChannel -= 16;
 				
 			}
-//System.out.println(currentChannel);
+
 			channelSelectBox.setValue(channelOptions.get(currentChannel));
 			channelSelectBox.setPromptText(channelOptions.get(currentChannel));			
 			setPanel();
@@ -295,7 +298,7 @@ public class PanelController implements MyDataListener , Observer{
 /*  ------------ copy swap Tone Editing------- */
 
 		@FXML void copyTone() {
-			System.out.println("copyTone");
+			//System.out.println("copyTone");
 			byte[] data = new byte[30];
 			
 			toneData.getToneData(currentChannel,data);
@@ -307,7 +310,7 @@ public class PanelController implements MyDataListener , Observer{
 
 
 		@FXML void swapTone(){
-			System.out.println("swap tone");
+			//System.out.println("swap tone");
 			byte[] data = new byte[30];			
 			toneData.getToneData(currentChannel,data);
 			toneData.setTone(currentChannel, toneMemory);
@@ -545,6 +548,11 @@ public class PanelController implements MyDataListener , Observer{
 
 		}
 		@FXML void sysExSelect() {
+			if(sysExSelect.isSelected() == true) {
+				forDomino.setVisible(true);
+			}else {
+				forDomino.setVisible(false);
+			}
 
 		}
 		@FXML void forDomino() {
@@ -639,11 +647,8 @@ public class PanelController implements MyDataListener , Observer{
 
 		@Override
 		public void update(EventType<MyDataEvent> e, eventSource source, int ch,int op, int val) {
-//System.out.println(e);
 			if(e == MyEvent.MyDataEvent.DATA_UPDATE) {
 				setPanel();
-//System.out.println("Reciev" + e + source + " - " + ch + " - " + op + " - " +  val);	
-		
 			}
 		}
 

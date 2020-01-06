@@ -12,10 +12,8 @@ public class StatusListCell extends ListCell<String> {
 		setText(null);
 		if(item != null) {
 			ImageView imageView = new ImageView(new Image(item));
-			//imageView.setFitWidth(43);
-			//imageView.setFitHeight(26);
 			setGraphic(imageView);
-			//setText("a");
+
 		}
 	}
 }

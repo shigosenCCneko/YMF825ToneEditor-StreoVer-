@@ -23,7 +23,7 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
- 
+
 
 public class OperatorPanel extends Pane 
 {
@@ -54,7 +54,7 @@ public class OperatorPanel extends Pane
 	ObservableList<String> options;
 
 	private MyDataListener listener;	
-	private int opNo = 0;
+	private int operatorNo = 0;
 
     public  OperatorPanel(){
     	 
@@ -63,8 +63,7 @@ public class OperatorPanel extends Pane
       	FXMLLoader fxmlLoader = new FXMLLoader(this.getClass().getResource("OperatorPanel.fxml"));
     	fxmlLoader.setRoot(this);
     	fxmlLoader.setController(this);
-    	// set FXMLLoader's classloader!
-    	fxmlLoader.setClassLoader(getClass().getClassLoader());
+
         try {
             fxmlLoader.load();            
         } catch (IOException exception) {
@@ -87,7 +86,7 @@ public class OperatorPanel extends Pane
 		   	if(i == 3){
 		   		operatorName.setText(data[0]);
 		   		operatorName.setTextFill(Color.valueOf(data[1]));
-		   		opNo = Integer.parseInt(data[2]);
+		   		operatorNo = Integer.parseInt(data[2]);
 		   	}
 		}	
 	};
@@ -139,9 +138,7 @@ public class OperatorPanel extends Pane
 		waveSelect.setCellFactory(c->new StatusListCell());
 		waveSelect.setButtonCell(new StatusListCell());
 		waveSelect.setValue(options.get(0));
-		
-		
-		
+
 	}
 
 	
@@ -199,7 +196,7 @@ public class OperatorPanel extends Pane
 	void changeValue(int val,eventSource source) {
 		//System.out.println((val + "") + (source) );			
 		if(listener != null)
-		listener.changeValue( MyDataEvent.OPDATA_CHANGE,source,opNo,val);
+		listener.changeValue( MyDataEvent.OPDATA_CHANGE,source,operatorNo,val);
 	
 	}
 
@@ -246,8 +243,6 @@ public class OperatorPanel extends Pane
 	}
 	public void setWave( int val){
 		waveSelect.setValue(options.get(val));	
-		
-		
 	}
 	public void setDT(Double val){
 		sliderDT.setValue(val);

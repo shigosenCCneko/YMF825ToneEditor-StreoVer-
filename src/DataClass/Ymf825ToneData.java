@@ -167,7 +167,6 @@ static final int OFS_WS_FB		= 8;
 			midiDev.write_tonearray(i, data[i]);
 		}
 		midiDev.writeBurstToneReg();
-//		listener.changeValue( MyDataEvent.DATA_UPDATE);	//Panelへ通知
 		notifyChange(MyDataEvent.DATA_UPDATE,eventSource.ToneChange,0,0,0);
 
 	}
@@ -178,7 +177,6 @@ static final int OFS_WS_FB		= 8;
 			midiDev.write_tonearray(i, data[i]);
 		}
 		midiDev.writeBurstToneReg();
-//		listener.changeValue( MyDataEvent.DATA_UPDATE);	//Panelへ通知
 		notifyChange(MyDataEvent.DATA_UPDATE,eventSource.ToneChange,0,0,0);
 	}
 
@@ -631,7 +629,7 @@ public void noteOff(int ch,int noteNo){
 public void setContinuousSoundMode(boolean i,int no){
 	continuousSoundMode = i;
 	noteNo = no;
-	//midiDev.setContinuousSoundMode(i);
+
 	if(i == true) {
 		midiDev.noteOn(editChannelNo, noteNo, 120);
 	}else {
@@ -692,9 +690,7 @@ public void changeSmodulateDelay(int midiChannelNo,int delayValue) {
 		toneDataInit();
 	}
 
-//	public void addListener(MyDataListener listener) {
-//		this.listener = listener;
-//	}
+
 
 	public void notifyChange(EventType<MyDataEvent> e,eventSource source,int ch, int op,int val) {
 		for(Enumeration<Observer> i = observers.elements(); i.hasMoreElements();) {

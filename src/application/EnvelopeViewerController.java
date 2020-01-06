@@ -118,7 +118,6 @@ public class EnvelopeViewerController implements Observer {
 		Window window = scene.getWindow();
 		window.hide();
 
-	//	Platform.exit();
 	}
 
 	@FXML void opSelectButton(){
@@ -157,7 +156,7 @@ public class EnvelopeViewerController implements Observer {
 
 			}
 			toneData.notifyStop(false);
-				toneData.setContinuousSoundMode(true,toneNo);		
+			toneData.setContinuousSoundMode(true,toneNo);		
 		}else {
 			envToneMode = false;
 			toneData.setContinuousSoundMode(false,toneNo);
@@ -179,10 +178,6 @@ public class EnvelopeViewerController implements Observer {
 		toneData.setTraceTlv(eventSource.Tlv,channelNo,op, tlv);
 
 	}
-
-
-
-
 
 
 

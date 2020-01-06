@@ -41,7 +41,7 @@ public class MySlider extends VBox  {
 
         /* accessibleTextに値が設定されたらパラメータを読みに行く */
         this.accessibleTextProperty().addListener(accessibleTextListener);
-myEvent = new MySliderEvent(MySliderEvent.UPDATE); //初期化
+        myEvent = new MySliderEvent(MySliderEvent.UPDATE); //初期化
         /* sliderの値が変化した場合 */
         slider.valueProperty().addListener((
         	ObservableValue<? extends Number> ov,Number old_val,

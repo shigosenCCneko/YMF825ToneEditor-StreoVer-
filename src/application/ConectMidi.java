@@ -15,8 +15,8 @@ import javax.sound.midi.SysexMessage;
 import javax.sound.midi.Transmitter;
 
 public class ConectMidi {
-	
-	
+
+
 	private final int  YMF825DATLEN = 30;
 
 	private MidiDevice midiInput;
@@ -27,27 +27,24 @@ public class ConectMidi {
 
 
 	private String midiInDeviceName = "aMIDIIN2 (LUFA Dual MIDI Demo)";
-//	private static String midiInDeviceName = "Keystation Mini 32)";
 	private String midiOutDeviceName ="aMIDIOUT2 (LUFA Dual MIDI Demo)";
 	private static String midiInDevices [];
 	private static String midiOutDevices[];
 	private byte midiExmesBuff[] = new byte[30];
-	
-	//private boolean continuousSoundMode = false;
 
-	
-	public enum Readtype{eeprom,tonememory,softwaremodulation};	
 
-	
+	public enum Readtype{eeprom,tonememory,softwaremodulation,conectmessage};
+
+
 
 	public ConectMidi() {
 		//dumpDeviceInfo();
-		getProperties();	
+		getProperties();
 		connect_midi();
 
 		YmReset();
 	}
-	
+
 	public void wait_millsec(int i){
 		try{
 			Thread.sleep(i);
@@ -56,57 +53,50 @@ public class ConectMidi {
 			e.printStackTrace();
 		}
 	}
+
 	public void YmReset(){
 		//usbInit();
-		wait_millsec(100);
+		wait_millsec(10);
 		send_command(0,0,0,0);
-
-		wait_millsec(700);
-
-
-
-		//ymRegInit();
 		wait_millsec(100);
+
 
 
 	}
-	
-	
+
+
 	public void send_command(int command,int ch,int dat1,int dat2){
 		midi_send_command(command,ch,dat1,dat2);
 	}
-	
-	
-	
+
+
 	public void set_tonedata(int addr,int data){
-
-
 		int ch;
-		
+
 		ch = addr/YMF825DATLEN;
 		addr = addr - ch * YMF825DATLEN;
 
 		send_command(10,ch,addr,data);
 
 }
+
 	public void writeBurstToneReg(){
 		send_command(9,0,0,0);
-	}	
+	}
+
 	public void write_tonearray(int addr,int data){
 
-			int ch,adr;
-			ch = addr/YMF825DATLEN;
-			adr = addr - ch * YMF825DATLEN;
+		int ch,adr;
+		ch = addr/YMF825DATLEN;
+		adr = addr - ch * YMF825DATLEN;
 
-			send_command(11,ch,adr,data);
+		send_command(11,ch,adr,data);
 
-	}	
-	
-	
-	
+	}
+
+
 
 	public void get_eepreg(int ch,byte[] buf){
-		//get_usb_ymreg(ch,buf);
 		get_memof_ymreg(ch,buf,Readtype.eeprom);
 	}
 	public void write_eepreg(int ch,int ofs,byte data) {
@@ -117,25 +107,33 @@ public class ConectMidi {
 	public void get_tonememory(int ch,byte[] buf){
 		get_memof_ymreg(ch,buf,Readtype.tonememory);
 	}
-	
+
 	public void get_softwaremodulation_parameter(int ch,byte[] buf){
 		get_memof_ymreg(ch,buf,Readtype.softwaremodulation);
 	}
-		
-	
-	
-	
+
+	public void get_conect_message(int ch, byte[] buf) {
+		get_memof_ymreg(0,buf,Readtype.conectmessage);
+	}
+
+
+
+
 	private synchronized void get_memof_ymreg(int ch,byte[] buf,Readtype type){
 		switch(type){
 		case eeprom:
 			send_command(6,ch,0,0);
 			break;
-		
+
 		case tonememory:
 			send_command(7,ch,0,0);
 			break;
 		case softwaremodulation:
 			send_command(8,ch,0,0);
+			break;
+		case conectmessage:
+			send_command(99,0,0,0);
+			
 		}
 
 
@@ -165,10 +163,10 @@ public class ConectMidi {
 		this.notifyAll();
 
 	}
-	
-	
-	
-	
+
+
+
+
 	public static void dumpDeviceInfo(){
 		ArrayList<MidiDevice> devices = getDevices();
 		midiInDevices = new String[devices.size()];
@@ -208,7 +206,7 @@ public class ConectMidi {
 
 		}
 	}
-	
+
 	public static ArrayList<MidiDevice> getDevices(){
 		ArrayList<MidiDevice> devices = new ArrayList<MidiDevice>();
 
@@ -231,7 +229,7 @@ public class ConectMidi {
 		return devices;
 
 	}
-	
+
 	public String[] getMidiInDeviceList(){
 		return midiInDevices;
 	}
@@ -251,8 +249,8 @@ public class ConectMidi {
 		}
 		return -1;
 	}
-	
-	
+
+
 	private void connect_midi(){
 		ArrayList<MidiDevice> devices = getDevices();
 		MidiDevice dev;
@@ -322,12 +320,12 @@ public class ConectMidi {
 			System.err.println(e.getMessage());
 		}
 
-		
+
 
 
 	}
-	
-	
+
+
 	public void close() {
 		//System.out.println("close midi device");
 		midiReceivTransmitter.close();
@@ -335,7 +333,7 @@ public class ConectMidi {
 		midiInput.close();
 		midiOutput.close();
 	}
-	
+
 	void midi_send_command(int command,int ch,int dat1,int dat2){
 
 		byte buff[] = new byte[12];
@@ -359,7 +357,7 @@ public class ConectMidi {
 		send_exmessage(buff,10);
 
 	}
-	
+
 	public void send_exmessage(byte[] buf,int len){
 		SysexMessage sxsm = new SysexMessage();
 		try {
@@ -391,10 +389,10 @@ public class ConectMidi {
 		}catch(IOException e){
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	
+
+
 	public void left_dt_add(int ch){
 		 send_command( 12,ch,0,0);
 	}
@@ -407,7 +405,7 @@ public class ConectMidi {
 			send_command(15,ch,0,0);
 
 	}
-	
+
 	public void SelectLeftChannelToneOnly(boolean i){
 		if(i == true){
 			send_command(14,1,0,0);
@@ -425,10 +423,6 @@ public class ConectMidi {
 	}
 
 
-	//public void setContinuousSoundMode(boolean i){
-	//	continuousSoundMode = i;
-		
-	//}
 
 	public void playMode(int i){
 		send_command(2,i,0,0);
@@ -437,18 +431,18 @@ public class ConectMidi {
 			//resetAlg(i);   // ymfのアルゴリズム配列の再構築
 		}
 
-
+System.out.println("test");
 
 	}
 
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
 }

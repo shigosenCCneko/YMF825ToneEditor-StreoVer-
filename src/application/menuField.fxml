@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.HBox?>
 
 <HBox fx:id="menuBarField" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MenuFieldController">
-	<MenuBar style="-fx-font-size: 12;">
+	<MenuBar fx:id="menuBar" style="-fx-font-size: 12;">
         <menus>
           <Menu mnemonicParsing="false" text="ToneSet">
             <items>
@@ -15,6 +15,8 @@
                   <MenuItem fx:id="saveToneSet" mnemonicParsing="false" onAction="#saveToneSet" text="Save Tone Set" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem fx:id="deviceToneSet" mnemonicParsing="false" onAction="#deviceToneSet" text="Load from Device" />
+               <SeparatorMenuItem mnemonicParsing="false" />
+               <MenuItem fx:id="exitMenu" mnemonicParsing="false" onAction="#exit" text="exit" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Tone">
@@ -22,7 +24,7 @@
               <MenuItem fx:id="loadTone" mnemonicParsing="false" onAction="#loadTone" text="Load Tone " />
                   <MenuItem fx:id="saveTone" mnemonicParsing="false" onAction="#saveTone" text="Save Tone " />
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem fx:id="deviceTone" mnemonicParsing="false" onAction="#deviceTone" text="Load from Device" />
+                  <MenuItem fx:id="deviceTone" mnemonicParsing="false" onAction="#loadToneFromDevice" text="Load from Device" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Edit">

@@ -290,7 +290,7 @@ public class SoftwareModulationController implements Observer {
 		sinDepthSlider.setValue(buf[3]/2);
 		modulationSlider.setValue(buf[1]);
 		waveSelectComboBox.setValue(waveOptions.get(buf[4]));
-		delaySlider.setValue(buf[5]/2);
+		delaySlider.setValue(buf[5]);
 		rePaint();
 	}
 
@@ -389,14 +389,11 @@ public class SoftwareModulationController implements Observer {
 		}
 	}
 
-private void rePaint() {
-	g.clearRect(0, 0, 418, 200);
-	drawLine();
-
-}
-
-
-
+	private void rePaint() {
+		g.clearRect(0, 0, 418, 200);
+		drawLine();
+	
+	}
 
 
 	@Override
