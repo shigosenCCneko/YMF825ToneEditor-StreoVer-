@@ -148,7 +148,7 @@ public class PanelController implements MyDataListener , Observer{
 			channelSelectBox.setValue("CH1");
 
 			toneOptions = FXCollections.observableArrayList();
-			for(int i = 0; i < 128;i++) {
+			for(int i = 0; i < 129;i++) {
 				toneOptions.add(ymf825Tone.getToneName(i));
 			}
 			toneSelectBox.setItems(toneOptions);
@@ -226,12 +226,14 @@ public class PanelController implements MyDataListener , Observer{
 		}
 		@FXML void changeTone() {
 			int i = toneOptions.indexOf(toneSelectBox.getValue());
-			toneSelectBox.setPromptText(toneOptions.get(i));
-			byte buf[] = new byte[30];
-			defaultTone.getDefTone825(i, buf);
-			toneData.setTone(currentChannel, buf);
-			setPanel();
-
+			if(i > 0) {
+				i--;
+				toneSelectBox.setPromptText(toneOptions.get(i));
+				byte buf[] = new byte[30];
+				defaultTone.getDefTone825(i, buf);
+				toneData.setTone(currentChannel, buf);
+				setPanel();
+			}
 		}
 		
 		

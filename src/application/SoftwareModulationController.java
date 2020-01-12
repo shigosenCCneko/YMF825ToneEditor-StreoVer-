@@ -31,7 +31,7 @@ public class SoftwareModulationController implements Observer {
 	int midiChannelNo = 0;
 	int delayValue = 50;
 	int waveNo = 0;
-
+	int tblofs = 14;
 
 	int sinTbl[][] = {
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -330,14 +330,17 @@ public class SoftwareModulationController implements Observer {
 
 		case 0:
 			viewTbl = sinTbl;
+			tblofs = 14;
 			no = 0;
 			break;
 		case 1:
 			viewTbl = triTbl;
+			tblofs = 14;
 			no = 1;
 			break;
 		case 2:
 			viewTbl = sawTbl;
+			tblofs = 0;
 			no = 2;
 			break;
 		default:
@@ -373,13 +376,16 @@ public class SoftwareModulationController implements Observer {
 		for(int i = 0; i < 65;i++){
 			x = i * scaleX;
 
-			 b = (sinPitch * i) % 64;
+			 b = (sinPitch * i+tblofs) % 64;
 
 			 c = (viewTbl[sinDepth][b]);
 
-			 d = (c + i+64 ) % 64;
+			 d = (c + i+64 +tblofs) % 64;
 
-			 y = viewTbl[modulation][d] * scaleY;
+			 y = -viewTbl[modulation][d] * scaleY;
+			 if(i == 0) {
+				 sy = y;
+			 }
 			 line(g,sx,sy,x,y);
 			 sx = x;
 			 sy = y;

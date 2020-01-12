@@ -431,7 +431,7 @@ public class ConectMidi {
 			//resetAlg(i);   // ymfのアルゴリズム配列の再構築
 		}
 
-System.out.println("test");
+
 
 	}
 
