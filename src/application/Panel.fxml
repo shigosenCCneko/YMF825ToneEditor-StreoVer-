@@ -43,7 +43,7 @@
 			           	<Pane prefWidth="9.0" />
                         <Pane fx:id="dummy2" layoutX="5.0" prefHeight="390.0" prefWidth="220.0" style="-fx-background-color: GRAY;" />
 -->
-			           	<OperatorPanel fx:id="operator1" AccessibleText="■■ OP1 ■■,GREEN,0" prefWidth="220.0" />
+			           	<OperatorPanel fx:id="operator1" AccessibleText="■■ OP1 ■■,LIME,0" prefWidth="220.0" />
 			           	<Pane prefWidth="9.0" />
                         <OperatorPanel fx:id="operator2" AccessibleText="■■ OP2 ■■,RED,1" prefWidth="220.0" />
 

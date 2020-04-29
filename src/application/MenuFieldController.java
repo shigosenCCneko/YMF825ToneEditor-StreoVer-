@@ -21,8 +21,10 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.HBox;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import toneData.DefaultTone;
 
 public class MenuFieldController {
 
@@ -35,6 +37,7 @@ public class MenuFieldController {
 
 	@FXML MenuItem  loadTone;
 	@FXML MenuItem  saveTone;
+	@FXML MenuItem  loadFromDir;
 	@FXML MenuItem  deviceTone;
 
 	@FXML MenuItem  copy12to34;
@@ -274,6 +277,45 @@ public MenuFieldController() throws IOException{
 	}
 
 
+	@FXML void loadFromDir() {
+		byte buf[] = new byte[300];
+		DefaultTone defTone = DefaultTone.getInstance();
+		
+		DirectoryChooser directoryChooser = new DirectoryChooser();
+		directoryChooser.setTitle("Load Tone from Dir");
+		File dir = new File(workDir);
+		if(dir.exists() == false) {
+			dir = new File(System.getProperty("user.home"));
+		}
+		directoryChooser.setInitialDirectory(dir);
+		File file = directoryChooser.showDialog(null);
+		if(file.isDirectory() == true) {
+			File[] list = file.listFiles();
+			if(list != null) {
+				for(int i = 0;i < list.length;i++) {
+					if(list[i].isFile()) {
+						try {
+							FileInputStream fis = new FileInputStream(list[i]);
+							BufferedInputStream bis = new BufferedInputStream(fis);
+							int len = bis.read(buf);
+							if(len == 30) {
+							
+								defTone.addDefTone(list[i].getName(), buf);
+
+							}
+							
+						}catch(IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+
+		}
+		
+	}
+	
+	
 	@FXML void loadToneFromDevice() {
 		byte [] buf = new byte[32];
 

@@ -98,7 +98,7 @@ public class PanelController implements MyDataListener , Observer{
 
 		private int currentChannel = 0;
 		private	 int eeprom_ch = 0;
-		private DefaultTone defaultTone = new DefaultTone();
+		private DefaultTone ymf825Tone;
 		
 		private Stage envelopeEditor;
 		private Parent envelopeRoot;
@@ -125,8 +125,8 @@ public class PanelController implements MyDataListener , Observer{
 
 		public void initialize() {
 
-			DefaultTone ymf825Tone = new DefaultTone();
-
+			//ymf825Tone = new DefaultTone();
+			ymf825Tone = DefaultTone.getInstance();
 			/* アルゴリズム選択ComboBoxの初期化 */
 			algoOptions = FXCollections.observableArrayList();
 			for(int i = 0;i < 8;i++){
@@ -146,15 +146,19 @@ public class PanelController implements MyDataListener , Observer{
 			}
 			channelSelectBox.setItems(channelOptions);
 			channelSelectBox.setValue("CH1");
-
-			toneOptions = FXCollections.observableArrayList();
-			for(int i = 0; i < 129;i++) {
-				toneOptions.add(ymf825Tone.getToneName(i));
-			}
-			toneSelectBox.setItems(toneOptions);
-
-
+			
 			toneData = Ymf825ToneData.getInstance();
+			
+			toneOptions = ymf825Tone.getToneOprions();
+			toneSelectBox.setItems(toneOptions);
+	//		toneOptions = FXCollections.observableArrayList();
+	//		for(int i = 0; i < 129;i++) {
+	//			toneOptions.add(ymf825Tone.getToneName(i));
+	//		}
+	//		toneSelectBox.setItems(toneOptions);
+
+
+
 			//toneData.addListener(this);
 
 			operatorArray = new OperatorPanel[4];
@@ -225,12 +229,17 @@ public class PanelController implements MyDataListener , Observer{
 
 		}
 		@FXML void changeTone() {
+			toneOptions = ymf825Tone.getToneOprions();
 			int i = toneOptions.indexOf(toneSelectBox.getValue());
 			if(i > 0) {
-				i--;
+				//i--;
+
 				toneSelectBox.setPromptText(toneOptions.get(i));
+	
 				byte buf[] = new byte[30];
-				defaultTone.getDefTone825(i, buf);
+
+				ymf825Tone.getDefTone825(i, buf);
+					
 				toneData.setTone(currentChannel, buf);
 				setPanel();
 			}
@@ -476,7 +485,12 @@ public class PanelController implements MyDataListener , Observer{
 			}
 			toneDataText.setText(new String(st));
 
-
+			/* コンソールへ音色データを表示 */			
+			System.out.println("  KC | AR | DR | SR | RR | SL | TL | VB | DT | WS");
+			for(int opno = 0;opno <4;opno++) {
+				
+				
+			}
 
 		}
 
@@ -548,6 +562,14 @@ public class PanelController implements MyDataListener , Observer{
 			toneDataText.setText(new String(st));
 
 
+
+			
+			
+			
+			
+			
+			
+			
 		}
 		@FXML void sysExSelect() {
 			if(sysExSelect.isSelected() == true) {
@@ -640,8 +662,15 @@ public class PanelController implements MyDataListener , Observer{
 						1==(double) toneData.getValue(currentChannel, opno, eventSource.XOF));
 
 			}
-
+toneOptions = ymf825Tone.getToneOprions();
+toneSelectBox.setItems(toneOptions);
 			toneData.notifyStop(false);
+			
+			
+			
+			
+			
+			
 		}
 
 

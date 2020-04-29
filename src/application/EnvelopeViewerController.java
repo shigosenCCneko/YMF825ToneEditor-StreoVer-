@@ -50,7 +50,7 @@ public class EnvelopeViewerController implements Observer {
 				{0,0,0,1},
 				{0,0,0,1},
 				{0,1,0,1},
-				{0,0,0,1},
+				{1,0,0,1},
 				{0,0,1,1}	};
 
 		private Ymf825ToneData toneData;
@@ -61,7 +61,8 @@ public class EnvelopeViewerController implements Observer {
 		private int timbrePosition = 0;
 		private double timbreTlValue = 0;
 		private int channelNo = 0;
-
+		private int carValue[] = new int[1000];	
+		private int carOP4Value[] = new int[1000];
 
 
 
@@ -294,21 +295,15 @@ public class EnvelopeViewerController implements Observer {
 
 		Color timbleColor = Color.DARKGRAY;
 		int Stroke = 5;
-
-
-
-
-
+		int carStroke = 4;
+		int modStroke = 3;
 
 		g.setLineWidth(Stroke);
-
 		g.setStroke(Color.WHITE);
 
 		line(g,keyOffTime,0,keyOffTime,250);
 		line(g,0,0,1000,0);
 
-
-		//scale = (double)2.0;
 		scale = 2.00;
 		scale_mag = 0.25;
 
@@ -332,9 +327,7 @@ public class EnvelopeViewerController implements Observer {
 			career = true;
 
 			TlMag = maxhight/Math.pow(1.122,maxTlVal*TlDbRate);
-//			SlMag = maxhight/Math.pow(0.8913,maxSlVal*(-SlDbRate));
 			SlMag = 1.0;
-
 
 		}else{
 			career = false;
@@ -346,11 +339,16 @@ public class EnvelopeViewerController implements Observer {
 
 
 		RELEASE:if(true){
-		Stroke--;
-		g.setLineWidth(Stroke);
+
+
+		if(career) {
+			g.setLineWidth(carStroke--);
+		}else {
+			g.setLineWidth(modStroke--);			
+		}
 		switch(i){
 		case 0:
-			g.setStroke( Color.GREEN);
+			g.setStroke( Color.LIME   );
 			if(OP_1.isSelected() == false){
 				traceModeTl[i] = 63;
 				continue;
@@ -399,8 +397,12 @@ public class EnvelopeViewerController implements Observer {
 
 		magni = endY/maxhight;
 		if(endX <= keyOffTime){
+if(attackRate[i] == 0) {
+	endY = startY;
+}
 
 			line(g,(int)startX, (int)startY,(int)endX,(int) endY);
+			fillRealEnvelope(i,career,g,startX,startY,endX,endY);
 			if(timbrePosition < endX){
 				slope = endY/endX;
 				step = timbrePosition;
@@ -414,9 +416,12 @@ public class EnvelopeViewerController implements Observer {
 			step = keyOffTime;
 			endX = keyOffTime;
 			endY = slope*step;
-
+if(attackRate[i] == 0) {
+	endY = startY;
+}
 
 			line(g,(int)startX, (int)startY,(int)endX,(int) endY);
+			fillRealEnvelope(i,career,g,startX,startY,endX,endY);
 			if(timbrePosition < endX){
 				step = timbrePosition;
 				timbreTlValue = slope * step;
@@ -449,8 +454,12 @@ public class EnvelopeViewerController implements Observer {
 		endX = startX + (slope*step);
 
 		if(endX <= keyOffTime){
+if(decayRate[i] == 0) {
+	endY = startY;
+}
 
 			line(g,(int)startX,(int) startY,(int) endX,(int) endY);
+			fillRealEnvelope(i,career,g,startX,startY,endX,endY);
 			if(startX <= timbrePosition && timbrePosition < endX){
 				slope = (endY - startY)/(endX - startX);
 				step = timbrePosition - startX;
@@ -470,9 +479,12 @@ public class EnvelopeViewerController implements Observer {
 			step = keyOffTime - startX;
 			endX = keyOffTime;
 			endY = startY + slope*step;
-
+if(decayRate[i] == 0) {
+	endY = startY;
+}
 
 			line(g,(int)startX,(int) startY,(int) endX,(int) endY);
+			fillRealEnvelope(i,career,g,startX,startY,endX,endY);
 			if(startX <= timbrePosition && timbrePosition < endX){
 				step = timbrePosition - startX;
 				timbreTlValue = startY + slope * step;
@@ -493,12 +505,17 @@ public class EnvelopeViewerController implements Observer {
 			slope = (endY-startY)/(endX-startX);
 			step =  (keyOffTime - startX);
 			endY = startY+ (slope*step);
+if(sustainRate[i] == 0) {
+	endY = startY;
+}
 
 		if(endY > 0 ){
 
 
 			endX = keyOffTime;
+
 			line(g,(int)startX,(int)startY,(int)endX,(int)endY);
+			fillRealEnvelope(i,career,g,startX,startY,endX,endY);
 			if(startX <= timbrePosition && timbrePosition < endX){
 				if(timbrePosition < 0){
 					timbreTlValue = 63;
@@ -519,7 +536,17 @@ public class EnvelopeViewerController implements Observer {
 			endY = 0;
 
 			endX = startX+(slope*step);
+
 			line(g,(int)startX,(int)startY,(int)endX,(int)endY);
+			fillRealEnvelope(i,career,g,startX,startY,endX,endY);
+			if(endX < 999){
+				for(int pos = (int)endX;pos <999;pos++){
+					carValue[pos] = 0;
+					if(i == 3) {
+						carOP4Value[pos] = 0;
+					}
+				}
+			}
 			if(startX <= timbrePosition && timbrePosition < endX){
 				slope = 1/slope;
 				step = timbrePosition - startX;
@@ -551,8 +578,20 @@ public class EnvelopeViewerController implements Observer {
 			step  = -startY;
 			endX = startX+(slope*step);
 			endY = 0;
-			line(g,(int)startX,(int)startY,(int)endX,(int)endY);
+if(releaseRate[i] ==0) {
+	endY = startY;
+}
 
+			line(g,(int)startX,(int)startY,(int)endX,(int)endY);
+			fillRealEnvelope(i,career,g,startX,startY,endX,endY);
+			if(endX < 999){
+				for(int pos = (int)endX;pos <999;pos++){
+					carValue[pos] = 0;
+					if(i == 3) {
+						carOP4Value[pos] = 0;
+					}
+				}
+			}
 			if(startX <= timbrePosition ){
 				slope = 1/slope;
 				step = timbrePosition - startX;
@@ -590,6 +629,72 @@ public class EnvelopeViewerController implements Observer {
 
 	}
 
+	private int  fillRealEnvelope(int opNo,boolean isCareer, GraphicsContext g,double startX,double startY,double endX,double endY){
 
+		int pos;
+		double slope = (endY-startY)/(endX-startX);
+		double width = g.getLineWidth();
+		g.setLineWidth(1);
+		
+		if(endX>999){
+			endX = 999;
+		}
+
+		for( pos = (int)startX; pos < endX; pos++){
+			int valY = (int)(slope * (pos-startX))+(int)startY;
+
+			if(isCareer == false){
+				switch(algorithmNo) {
+				case 3:
+					if(opNo == 0){
+						valY = valY * carOP4Value[pos]/250;		
+						if((pos % 3) == 0) {					
+							line(g,pos,0,pos,valY);
+						}						
+	
+					}else{
+							valY = valY * carValue[pos]/250;
+							line(g,pos,0,pos,valY);						
+		
+					}					
+					
+					break;
+				case 5:
+					valY = valY * carValue[pos]/250;					
+					if(opNo == 0){
+						if((pos % 3) == 0) {					
+							line(g,pos,0,pos,valY);
+						}						
+	
+					}else {
+						line(g,pos,0,pos,valY);						
+					}
+	
+					break;
+				default:
+					valY = valY * carValue[pos]/250;
+					line(g,pos,0,pos,valY);					
+					
+					break;
+				
+				}
+
+			}
+			carValue[pos] = valY;
+			if(opNo == 3) {
+				carOP4Value[pos] = valY;
+			}
+			if(valY<0){
+				break;
+			}
+
+		}
+		g.setLineWidth(width);
+		return pos;
+
+	}
+	
+	
+	
 
 }

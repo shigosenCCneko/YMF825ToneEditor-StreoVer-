@@ -1,5 +1,10 @@
 package toneData;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class DefaultTone {
 
@@ -174,6 +179,7 @@ String toneName[]={
 		};
 
 	static char tone4op[] = {
+
 			0x00,0x31,0x8f,0xb1,0x5e,0x00,0x11,0x80,0xb1,0x8f,0x00,0x00,0x00,0x08,0x31,0x19,0xa1,0xb4,0x00,0x31,0x00,0xa1,0xd7,0x00,0x00,0x00,0x01,
 			0x00,0x11,0x47,0xc1,0xe2,0x00,0x11,0x04,0xe2,0xf6,0x00,0x00,0x00,0x08,0x11,0x14,0xc1,0xd5,0x00,0x31,0x04,0xc2,0xe6,0x00,0x00,0x00,0x01,
 			0x00,0x13,0x53,0xf3,0xd4,0x00,0x11,0x00,0xb1,0xe5,0x00,0x00,0x00,0x0c,0x11,0x47,0xb1,0xe4,0x00,0x91,0x00,0xb1,0xf5,0x00,0x00,0x00,0x01,
@@ -305,6 +311,7 @@ String toneName[]={
 			};
 
 	static char tone825[] = {
+			0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 		121, 67,  0,103,255,157,  0, 16, 64, 33, 51,163,115,  0, 96,  0, 32, 67,177, 96,  1, 16,  0, 33, 99,212,  2,  1, 16,  0,		
 //		121, 67,  2,103,255,157,  0, 16, 64, 35, 51,226,115,  0, 80,  0, 18, 65,211, 88,  1, 16,  0, 35, 99,212,  2,  1, 16,  0,
 		121, 67, 35, 34,245,158,  0, 16,  0, 34, 50,255,114,  0, 80,  0, 35, 34,253,102,  1, 16,  0, 19, 82,244, 40,  1, 16,  0,
@@ -438,14 +445,67 @@ String toneName[]={
 		121, 69,  2,  3,255, 44,  1, 80,  7,130,134,251, 16, 17,240, 48,  2,  2,255,  8, 17, 80, 15,130,134,251,104, 17, 80, 48,
 
 	};
+	
+	
+	
+	/* Singleton 定義 */
+	public static class DefaultToneInstanceHolder{
+		private static final DefaultTone INSTANCE = new DefaultTone();
+
+
+	}
+
+	public static DefaultTone getInstance() {
+		return DefaultToneInstanceHolder.INSTANCE;
+	}
+
+	class ToneData825{
+		private String toneName;
+		private byte toneData[];
+	}
+	
+	List<ToneData825>Array825;
+	ObservableList<String> toneOptions;
+
+	public DefaultTone() {
+
+		toneOptions = FXCollections.observableArrayList();
+		Array825 = new ArrayList<ToneData825>();
+		
+		for(int i = 0;i<129;i++) {
+			ToneData825 newTone = new ToneData825();
+			toneOptions.add(toneName[i]);
+			newTone.toneName = new String(toneName[i]);
+			newTone.toneData = new byte[30];
+			
+			
+			for(int j = 0; j < 30;j++) {
+				newTone.toneData[j] = (byte) tone825[j+i*30];
+			}
+			Array825.add(newTone);
+		}
+
+	}
+public ObservableList<String> getToneOprions(){
+	return toneOptions;
+}
 public void getDefTone825(int waveno,byte buf[]){
+
+
+	for(int i = 0 ;i <30;i++) {
+		buf[i] = Array825.get(waveno).toneData[i];
+		
+	}
+
+	/*
 	int dp = waveno * 30;
 	for(int i= 0;i<30;i++){
 		buf[i] = (byte)tone825[dp+i];
 	}
+	*/
 }
 
-	
+/*
 public void getDefTone(int optype,int waveno,byte buf[]){
 	int i;
 	int dp;
@@ -467,12 +527,28 @@ public void getDefTone(int optype,int waveno,byte buf[]){
 	}
 	
 }
+*/
 
-public String getToneName(int no){
-	return toneName[no];
+
+public void addDefTone(String tonename,byte buf[]) {
+	ToneData825 newTone = new ToneData825();
+	newTone.toneName = tonename;
+	newTone.toneData = new byte[30];
+	for(int i = 0;i<30;i++) {
+		newTone.toneData[i] = buf[i];
+	}
+	Array825.add(newTone);
+	
+	toneOptions.add(tonename);
+
 	
 }
-public String[] getToneNameArray(){
-	return toneName;
+public String getToneName(int no){
+	
+	return (String)Array825.get(no).toneName;
+
+	//return toneName[no];
+	
 }
+
 }

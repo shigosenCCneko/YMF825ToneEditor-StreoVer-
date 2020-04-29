@@ -23,6 +23,8 @@
             <items>
               <MenuItem fx:id="loadTone" mnemonicParsing="false" onAction="#loadTone" text="Load Tone " />
                   <MenuItem fx:id="saveTone" mnemonicParsing="false" onAction="#saveTone" text="Save Tone " />
+               <SeparatorMenuItem mnemonicParsing="false" />
+               <MenuItem fx:id="loadFromDir" mnemonicParsing="false" onAction="#loadFromDir" text="Load from Dir" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem fx:id="deviceTone" mnemonicParsing="false" onAction="#loadToneFromDevice" text="Load from Device" />
             </items>
