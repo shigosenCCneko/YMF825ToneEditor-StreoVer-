@@ -161,10 +161,11 @@ static final int OFS_WS_FB		= 8;
 
 
 	public  void setTone(int ch,byte data[]) {
+
 		int adr = ch * DATA_LEN;
 		for(int i = 0; i < DATA_LEN;i ++) {
 			toneData[adr + i] = data[i];
-			midiDev.write_tonearray(i, data[i]);
+			midiDev.write_tonearray(adr + i, data[i]); //adr + i に成っていなかった
 		}
 		midiDev.writeBurstToneReg();
 		notifyChange(MyDataEvent.DATA_UPDATE,eventSource.ToneChange,0,0,0);

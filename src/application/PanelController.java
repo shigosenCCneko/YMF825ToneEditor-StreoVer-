@@ -43,6 +43,7 @@ public class PanelController implements MyDataListener , Observer{
 
 		@FXML ComboBox<String> toneSelectBox;
 		ObservableList<String> toneOptions;
+		private boolean  setOptionsFlag = false;
 
 		@FXML ComboBox<String>	channelSelectBox;
 		ObservableList<String> channelOptions;
@@ -229,6 +230,7 @@ public class PanelController implements MyDataListener , Observer{
 
 		}
 		@FXML void changeTone() {
+			if(setOptionsFlag == false) {
 			toneOptions = ymf825Tone.getToneOprions();
 			int i = toneOptions.indexOf(toneSelectBox.getValue());
 			if(i > 0) {
@@ -244,7 +246,7 @@ public class PanelController implements MyDataListener , Observer{
 				setPanel();
 			}
 		}
-		
+		}
 		
 		@FXML void envelopeViewerShow() {
 			if(envelopeViewer.isSelected()== true) {
@@ -662,8 +664,10 @@ public class PanelController implements MyDataListener , Observer{
 						1==(double) toneData.getValue(currentChannel, opno, eventSource.XOF));
 
 			}
+setOptionsFlag = true;
 toneOptions = ymf825Tone.getToneOprions();
 toneSelectBox.setItems(toneOptions);
+setOptionsFlag = false;
 			toneData.notifyStop(false);
 			
 			

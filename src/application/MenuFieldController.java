@@ -297,13 +297,14 @@ public MenuFieldController() throws IOException{
 						try {
 							FileInputStream fis = new FileInputStream(list[i]);
 							BufferedInputStream bis = new BufferedInputStream(fis);
+							if(  list[i].getName().toLowerCase().contains(".sd1")==true) {
 							int len = bis.read(buf);
 							if(len == 30) {
 							
 								defTone.addDefTone(list[i].getName(), buf);
 
 							}
-							
+							}
 						}catch(IOException e) {
 							e.printStackTrace();
 						}
