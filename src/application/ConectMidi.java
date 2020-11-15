@@ -17,7 +17,7 @@ import javax.sound.midi.Transmitter;
 public class ConectMidi {
 
 
-	private final int  YMF825DATLEN = 30;
+	//private final int  YMF825DATLEN = 30;
 
 	private MidiDevice midiInput;
 	private MidiDevice midiOutput;
@@ -73,8 +73,8 @@ public class ConectMidi {
 	public void set_tonedata(int addr,int data){
 		int ch;
 
-		ch = addr/YMF825DATLEN;
-		addr = addr - ch * YMF825DATLEN;
+		ch = addr/ YMFConstants.DATA_LEN;
+		addr = addr - ch * YMFConstants.DATA_LEN;
 
 		send_command(10,ch,addr,data);
 
@@ -87,8 +87,8 @@ public class ConectMidi {
 	public void write_tonearray(int addr,int data){
 
 		int ch,adr;
-		ch = addr/YMF825DATLEN;
-		adr = addr - ch * YMF825DATLEN;
+		ch = addr/YMFConstants.DATA_LEN;
+		adr = addr - ch * YMFConstants.DATA_LEN;
 
 		send_command(11,ch,adr,data);
 
@@ -144,7 +144,7 @@ public class ConectMidi {
 			e.printStackTrace();
 		}
 
-		for(int i = 0;i < YMF825DATLEN;i++){
+		for(int i = 0;i < YMFConstants.DATA_LEN;i++){
 			buf[i] = midiExmesBuff[i];
 		}
 

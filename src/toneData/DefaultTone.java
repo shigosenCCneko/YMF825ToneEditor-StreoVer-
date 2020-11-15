@@ -3,6 +3,7 @@ package toneData;
 import java.util.ArrayList;
 import java.util.List;
 
+import application.YMFConstants;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -476,11 +477,10 @@ String toneName[]={
 			ToneData825 newTone = new ToneData825();
 			toneOptions.add(toneName[i]);
 			newTone.toneName = new String(toneName[i]);
-			newTone.toneData = new byte[30];
-			
-			
+			newTone.toneData = new byte[YMFConstants.DATA_LEN];
+
 			for(int j = 0; j < 30;j++) {
-				newTone.toneData[j] = (byte) tone825[j+i*30];
+				newTone.toneData[j] = (byte) tone825[j+i*YMFConstants.DATA_LEN];
 			}
 			Array825.add(newTone);
 		}
@@ -492,7 +492,7 @@ public ObservableList<String> getToneOprions(){
 public void getDefTone825(int waveno,byte buf[]){
 
 
-	for(int i = 0 ;i <30;i++) {
+	for(int i = 0 ;i <YMFConstants.DATA_LEN;i++) {
 		buf[i] = Array825.get(waveno).toneData[i];
 		
 	}
@@ -533,8 +533,8 @@ public void getDefTone(int optype,int waveno,byte buf[]){
 public void addDefTone(String tonename,byte buf[]) {
 	ToneData825 newTone = new ToneData825();
 	newTone.toneName = tonename;
-	newTone.toneData = new byte[30];
-	for(int i = 0;i<30;i++) {
+	newTone.toneData = new byte[YMFConstants.DATA_LEN];
+	for(int i = 0;i<YMFConstants.DATA_LEN;i++) {
 		newTone.toneData[i] = buf[i];
 	}
 	Array825.add(newTone);

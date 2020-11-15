@@ -95,7 +95,6 @@ public MenuFieldController() throws IOException{
 	}
 
 
-
 	@FXML void loadToneSet() {
 
 		FileChooser fileChooser = new FileChooser();
@@ -225,10 +224,10 @@ public MenuFieldController() throws IOException{
 			try {
 				FileInputStream fis = new FileInputStream(file);
 				BufferedInputStream bis = new BufferedInputStream(fis);
-				byte rbuf[] = new byte[30];
+				byte rbuf[] = new byte[YMFConstants.DATA_LEN];
 				int len = bis.read(rbuf);
 
-				if(len == 30){
+				if(len == YMFConstants.DATA_LEN){
 					Ymf825ToneData aaa = Ymf825ToneData.getInstance();
 					aaa.setTone(PanelController.getPanelChannel(), rbuf);
 
@@ -257,10 +256,10 @@ public MenuFieldController() throws IOException{
 		File file = fileChooser.showSaveDialog(null);
 
 		if(file != null) {
-			byte buf[] = new byte[30];
+			byte buf[] = new byte[YMFConstants.DATA_LEN];
 			ymf825.getToneData(PanelController.getPanelChannel(),buf);
-			byte wbuf[]= new byte [30];
-			for(int i = 0;i < 30;i++){
+			byte wbuf[]= new byte [YMFConstants.DATA_LEN];
+			for(int i = 0;i < YMFConstants.DATA_LEN;i++){
 				wbuf[i] = (byte)(buf[i] & 0xff);
 			}
 			try{
@@ -289,31 +288,34 @@ public MenuFieldController() throws IOException{
 		}
 		directoryChooser.setInitialDirectory(dir);
 		File file = directoryChooser.showDialog(null);
-		if(file.isDirectory() == true) {
-			File[] list = file.listFiles();
-			if(list != null) {
-				for(int i = 0;i < list.length;i++) {
-					if(list[i].isFile()) {
-						try {
-							FileInputStream fis = new FileInputStream(list[i]);
-							BufferedInputStream bis = new BufferedInputStream(fis);
-							if(  list[i].getName().toLowerCase().contains(".sd1")==true) {
-							int len = bis.read(buf);
-							if(len == 30) {
-							
-								defTone.addDefTone(list[i].getName(), buf);
-
+		if(file != null) {
+		
+			if(file.isDirectory() == true) {
+				File[] list = file.listFiles();
+				if(list != null) {
+					for(int i = 0;i < list.length;i++) {
+						if(list[i].isFile()) {
+							try {
+								FileInputStream fis = new FileInputStream(list[i]);
+								BufferedInputStream bis = new BufferedInputStream(fis);
+								if(  list[i].getName().toLowerCase().contains(".sd1")==true) {
+									int len = bis.read(buf);
+									if(len == YMFConstants.DATA_LEN) {
+								
+										defTone.addDefTone(list[i].getName(), buf);
+	
+									}
+								}
+								bis.close();
+							}catch(IOException e) {
+								e.printStackTrace();
 							}
-							}
-						}catch(IOException e) {
-							e.printStackTrace();
 						}
 					}
 				}
+	
 			}
-
 		}
-		
 	}
 	
 	
@@ -346,14 +348,14 @@ public MenuFieldController() throws IOException{
 
 
 	@FXML void copy12to34() {
-		byte buf[] = new byte[30];
+		byte buf[] = new byte[YMFConstants.DATA_LEN];
 		toneData.getToneData(PanelController.getPanelChannel(),buf);
 		copyOp(0,2,buf);
 		copyOp(1,3,buf);
 		toneData.setTone(PanelController.getPanelChannel(),buf);
 	}
 	@FXML void copy12to34Clear() {
-		byte buf[] = new byte[30];
+		byte buf[] = new byte[YMFConstants.DATA_LEN];
 		toneData.getToneData(PanelController.getPanelChannel(),buf);
 		copyOp(0,2,buf);
 		copyOp(1,3,buf);
@@ -362,7 +364,7 @@ public MenuFieldController() throws IOException{
 		toneData.setTone(PanelController.getPanelChannel(),buf);
 	}
 	@FXML void copy12to23() {
-		byte buf[] = new byte[30];
+		byte buf[] = new byte[YMFConstants.DATA_LEN];
 		toneData.getToneData(PanelController.getPanelChannel(),buf);
 		copyOp(1,2,buf);
 		copyOp(0,1,buf);
@@ -372,7 +374,7 @@ public MenuFieldController() throws IOException{
 
 	}
 	@FXML void copy1to234() {
-		byte buf[] = new byte[30];
+		byte buf[] = new byte[YMFConstants.DATA_LEN];
 		toneData.getToneData(PanelController.getPanelChannel(),buf);
 		copyOp(0,1,buf);
 		copyOp(0,2,buf);

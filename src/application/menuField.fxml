@@ -22,7 +22,7 @@
           <Menu mnemonicParsing="false" text="Tone">
             <items>
               <MenuItem fx:id="loadTone" mnemonicParsing="false" onAction="#loadTone" text="Load Tone " />
-                  <MenuItem fx:id="saveTone" mnemonicParsing="false" onAction="#saveTone" text="Save Tone " />
+                  <MenuItem fx:id="saveTone" mnemonicParsing="false" onAction="#saveTone" text="Save Tone" />
                <SeparatorMenuItem mnemonicParsing="false" />
                <MenuItem fx:id="loadFromDir" mnemonicParsing="false" onAction="#loadFromDir" text="Load from Dir" />
                   <SeparatorMenuItem mnemonicParsing="false" />
@@ -45,7 +45,7 @@
               <items>
                 <MenuItem fx:id="monoMode" mnemonicParsing="false" onAction="#monoMode" text="Mono" />
                   <MenuItem fx:id="polyMode" mnemonicParsing="false" onAction="#polyMode" text="Poly" />
-                  <MenuItem fx:id="d8polyMode" mnemonicParsing="false" onAction="#d8polyMode" text="D-Poly8" />
+                  <MenuItem fx:id="d8polyMode" mnemonicParsing="false" onAction="#d8polyMode" text="Double-Poly8" />
               </items>
             </Menu>
         </menus>

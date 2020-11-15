@@ -12,6 +12,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.VBox;
 /*
  *  Custom Slider with NameLabel and ValueLabel
@@ -19,25 +20,25 @@ import javafx.scene.layout.VBox;
 
 
 public class MySlider extends VBox  {
-	
+
     @FXML private Label nameLabel;
     @FXML private Label valueLabel;
     @FXML private Slider slider;
     Event myEvent = null;
-	
+
     public MySlider() {
     	super();
-	
+
     	FXMLLoader fxmlLoader = new FXMLLoader(this.getClass().getResource("Myslider.fxml"));
     	fxmlLoader.setRoot(this);
     	fxmlLoader.setController(this);
     	// set FXMLLoader's classloader!
     	fxmlLoader.setClassLoader(getClass().getClassLoader());
         try {
-            fxmlLoader.load();            
+            fxmlLoader.load();
         } catch (IOException exception) {
             throw new RuntimeException(exception);
-        }  
+        }
 
         /* accessibleTextに値が設定されたらパラメータを読みに行く */
         this.accessibleTextProperty().addListener(accessibleTextListener);
@@ -47,15 +48,47 @@ public class MySlider extends VBox  {
         	ObservableValue<? extends Number> ov,Number old_val,
     		Number new_val) ->{
     			sliderChangeValue(new_val.intValue());
-    	}); 	  
-        
-        
+    	});
+
+        slider.setOnScroll((ScrollEvent event) ->{
+        	double deltaY = event.getDeltaY();
+        	double multiY = event.getMultiplierY();
+
+        	double cnt = (int)(deltaY/multiY);
+    
+        	double max = slider.getMax();
+        	double val = slider.getValue();
+        	
+        	val = val + cnt;
+        	if(val >=0 && val <= max) {
+        		if(slider.isFocused()== true) {
+        		slider.setValue(val);
+        		}
+        	}
+        	
+        	
+        });
+
+
     }
-    
-    
-    /* パラメータの処理     "name,min,max,val"   */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	/* パラメータの処理     "name,min,max,val"   */
 	 ChangeListener<String> accessibleTextListener = new ChangeListener<String>() {
-		@Override 
+		@Override
 		public void changed(ObservableValue<?extends String>observable,String oldValue,String newValue) {
 			String data[] = newValue.split(",");
 
@@ -67,9 +100,9 @@ public class MySlider extends VBox  {
 		   		Double val = Double.parseDouble(data[3]);
 		  		slider.setValue(val);
 		   	}
-		}	
+		}
 	};
- 
+
 
     protected void sliderChangeValue(int i) {
     	//int i = 0;
@@ -81,12 +114,12 @@ public class MySlider extends VBox  {
     	node.fireEvent(myEvent);
 
     }
- 	
-        
+
+
     public void setLabelName(String name) {
     	nameLabel.setText(name);
     }
-    
+
     public void setValue(Double val) {
     	slider.setValue( val);
     }

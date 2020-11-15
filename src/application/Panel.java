@@ -31,7 +31,7 @@ public class Panel extends Application
 
         System.setProperty( "prism.lcdtext" , "false" );
 
-        FXMLLoader      fxmlLoader  = new FXMLLoader( getClass().getResource( "Panel.fxml" ) );
+        FXMLLoader      fxmlLoader  = new FXMLLoader( getClass().getResource( "/application/Panel.fxml" ) );
         Pane    root        = (Pane) fxmlLoader.load();
         Scene   scene       = new Scene( root , 650 , 800 );
         

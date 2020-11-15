@@ -81,8 +81,7 @@ public class PanelController implements MyDataListener , Observer{
 
 		@FXML HBox			fourOpBox;
 
-		
-
+	
 		/*
 		 * SeneBuilder用 OperatorPanelの代わり
 		 */
@@ -95,7 +94,7 @@ public class PanelController implements MyDataListener , Observer{
 		static PanelController parent;
 		
 		static Ymf825ToneData  toneData;
-		private byte[] toneMemory = new byte[30];
+		private byte[] toneMemory = new byte[YMFConstants.DATA_LEN];
 
 		private int currentChannel = 0;
 		private	 int eeprom_ch = 0;
@@ -238,7 +237,7 @@ public class PanelController implements MyDataListener , Observer{
 
 				toneSelectBox.setPromptText(toneOptions.get(i));
 	
-				byte buf[] = new byte[30];
+				byte buf[] = new byte[YMFConstants.DATA_LEN];
 
 				ymf825Tone.getDefTone825(i, buf);
 					
@@ -312,10 +311,10 @@ public class PanelController implements MyDataListener , Observer{
 
 		@FXML void copyTone() {
 			//System.out.println("copyTone");
-			byte[] data = new byte[30];
+			byte[] data = new byte[YMFConstants.DATA_LEN];
 			
 			toneData.getToneData(currentChannel,data);
-			for(int i = 0;i<30;i++) {
+			for(int i = 0;i<YMFConstants.DATA_LEN;i++) {
 				toneMemory[i] = data[i];
 			}
 			setPanel();
@@ -324,10 +323,10 @@ public class PanelController implements MyDataListener , Observer{
 
 		@FXML void swapTone(){
 			//System.out.println("swap tone");
-			byte[] data = new byte[30];			
+			byte[] data = new byte[YMFConstants.DATA_LEN];			
 			toneData.getToneData(currentChannel,data);
 			toneData.setTone(currentChannel, toneMemory);
-			for(int i = 0;i<30;i++) {
+			for(int i = 0;i<YMFConstants.DATA_LEN;i++) {
 				toneMemory[i] = data[i];
 			}
 			setPanel();
@@ -374,20 +373,20 @@ public class PanelController implements MyDataListener , Observer{
 		@FXML void readFromText() {
 			/* テキストフィールドからカレントチャンネルへ音色データを読み込む　*/
 
-				byte [] buf = new byte[30];
+				byte [] buf = new byte[YMFConstants.DATA_LEN];
 				String s;
 				String str = toneDataText.getText();
 				String[] token = str.split(",",0);
 				int cnt = token.length;
 				int data,k,l;
-				if(cnt >= 30 ){
+				if(cnt >= YMFConstants.DATA_LEN ){
 					if(cnt < 41){
 						for(int i =0;i < cnt;i++){
 							s = token[i].trim();
 							buf[i] =(byte) (0x00ff & Integer.parseInt(s));
 						}
 					}else{
-						for(int i = 0;i<30;i++){
+						for(int i = 0;i<YMFConstants.DATA_LEN;i++){
 							buf[i] = 0;
 						}
 
@@ -469,8 +468,9 @@ public class PanelController implements MyDataListener , Observer{
 		}
 
 		
+		
 		private void setcopypastDataRow(){
-			byte [] buf = new byte[30];
+			byte [] buf = new byte[YMFConstants.DATA_LEN];
 			StringBuilder st = new StringBuilder();
 			toneData.getToneData(currentChannel, buf);
 			int cnt = 2;
@@ -488,16 +488,61 @@ public class PanelController implements MyDataListener , Observer{
 			toneDataText.setText(new String(st));
 
 			/* コンソールへ音色データを表示 */			
-			System.out.println("  KC | AR | DR | SR | RR | SL | TL | VB | DT | WS");
+
+			
+			int commonBo = toneData.getValue(currentChannel, 0, eventSource.BO);
+			int commonLfo = toneData.getValue(currentChannel,0,eventSource.Lfo);
+			int commonAlg = toneData.getValue(currentChannel, 0, eventSource.Connect);
+			int common = (commonBo << 5) | (commonLfo << 3) | commonAlg;
+			System.out.printf("0x%02x,  // VoiceCommon\n",common);
+			System.out.println("{//  KC | AR | DR | SR | RR | SL | TL | VB | DT | WS");			
 			for(int opno = 0;opno <4;opno++) {
+				int opeFb = 0;
+				if(opno == 0 ) {	
+					opeFb = toneData.getValue(currentChannel, opno, eventSource.FeedBK);
+				}else if(opno == 2) {
+					opeFb = toneData.getValue(currentChannel, opno, eventSource.FeedBK2);
+				
+				}
+				int opeXof = toneData.getValue(currentChannel, opno, eventSource.XOF);
+				int opeKsr = toneData.getValue(currentChannel, opno, eventSource.Ksr);
+				int opeKsl = toneData.getValue(currentChannel, opno, eventSource.Ksl);
+				
+				int opeKc = (opeFb <<4) | (opeXof <<3) | (opeKsr <<2) | opeKsl;
+				
+				int opeAr = toneData.getValue(currentChannel, opno, eventSource.Atck);
+				int opeDr = toneData.getValue(currentChannel, opno, eventSource.Decy);
+				int opeSr = toneData.getValue(currentChannel, opno, eventSource.Sus);
+				int opeRr = toneData.getValue(currentChannel, opno, eventSource.Rel);
+				int opeSl =toneData.getValue(currentChannel, opno, eventSource.SL);
+				int opeTl = toneData.getValue(currentChannel, opno, eventSource.Tlv);
+				
+				int opeDam = toneData.getValue(currentChannel, opno, eventSource.Dam);
+				int opeEam = toneData.getValue(currentChannel, opno, eventSource.EAM);
+				int opeDvb = toneData.getValue(currentChannel, opno, eventSource.Dvb);
+				int opeEvb = toneData.getValue(currentChannel, opno, eventSource.EVB);
+				
+				int opeEDams = (opeDam <<5)|(opeEam <<4)|(opeDvb <<1)|opeEvb;
+				
+				int opeDt = toneData.getValue(currentChannel, opno, eventSource.DT);
+				int opeMul = toneData.getValue(currentChannel, opno, eventSource.Mul);
+				
+				int opeMuls = (opeMul )|(opeDt<< 4);
+				
+				int opeWs = toneData.getValue(currentChannel, opno, eventSource.Wave);
+				
+				System.out.printf("   {0x%02X,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x,0x%02x},"
+						,opeKc,opeAr,opeDr,opeSr,opeRr,opeSl,opeTl,opeEDams,opeMuls,opeWs);
+				System.out.println(" ");
 				
 				
 			}
+			System.out.println("}");
 
 		}
 
 		private void setcopypasteDataSysEx(){
-			byte []buf = new byte[30];
+			byte []buf = new byte[YMFConstants.DATA_LEN];
 			int []dat = new int[41];
 			int j,k;
 			int data;
