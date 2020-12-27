@@ -3,6 +3,7 @@ package CustomComponent;
 
 
 import java.io.IOException;
+import java.util.Random;
 
 import MyEvent.MyDataEvent;
 import MyEvent.MyDataListener;
@@ -62,8 +63,8 @@ public class OperatorPanel extends Pane
 	ContextMenu menu;
 	private MyDataListener listener;
 	private int operatorNo = 0;
-	
-	
+
+
 	static int operatorAtk = 15;
 	static int operatorDecy = 0;
 	static int operatorSus = 0;
@@ -75,16 +76,16 @@ public class OperatorPanel extends Pane
 	static int operatorKsl = 0;
 	static int operatorDam = 0;
 	static int operatorDvb = 0;
-	
+
 	static int operatorEam = 0;
 	static int operatorEvb = 0;
 	static int operatorKsr = 0;
 	static int operatorXof = 0;
 	static int operatorWave = 0;
 	static int operatorFb = 0;
-	
-	
-	
+
+
+
 	final int defaultAtk = 15;
 	final int defaultDecy = 0;
 	final int defaultSus = 0;
@@ -96,14 +97,14 @@ public class OperatorPanel extends Pane
 	final int defaultKsl = 0;
 	final int defaultDam = 0;
 	final int defaultDvb = 0;
-	
+
 	final int defaultEam = 0;
 	final int defaultEvb = 0;
 	final int defaultKsr = 0;
 	final int defaultXof = 0;
 	final int defaultWave = 0;
 	final int defaultFb = 0;
-	
+
 
     public  OperatorPanel(){
 
@@ -209,34 +210,39 @@ public class OperatorPanel extends Pane
 		/*
 		 * 右クリックのみメニュー選択可にするためLabelにsetOnMouseClickedを付ける
 		 */
-		
-		MenuItem[]menui = new MenuItem[7];
-		Label[]labeli = new Label[5];
-		
+
+		MenuItem[]menui = new MenuItem[8];
+		Label[]labeli = new Label[6];
+
 		labeli[0] = new Label("copy");
 		labeli[1] = new Label("paste");
 		labeli[2] = new Label("ADSRcopy");
 		labeli[3] = new Label("ADSRpaste");
 		labeli[4] = new Label("clear");
-		
+		labeli[5] = new Label("Random");
+
 		labeli[0].setOnMouseClicked(e-> {
 			if(e.getButton() == MouseButton.PRIMARY) {
 				editCopy(e);}});
 		labeli[1].setOnMouseClicked(e-> {
 			if(e.getButton() == MouseButton.PRIMARY) {
 				editPaste(e);}});
-		
+
 		labeli[2].setOnMouseClicked(e-> {
-			if(e.getButton() == MouseButton.PRIMARY) {			
+			if(e.getButton() == MouseButton.PRIMARY) {
 			adsrCopy(e);}});
 		labeli[3].setOnMouseClicked(e-> {
-			if(e.getButton() == MouseButton.PRIMARY) {		
+			if(e.getButton() == MouseButton.PRIMARY) {
 				adsrPaste(e);}});
 		labeli[4].setOnMouseClicked(e-> {
 			if(e.getButton() == MouseButton.PRIMARY) {
 		editClear(e);}});
-		
-		
+
+		labeli[5].setOnMouseClicked(e-> {
+			if(e.getButton() == MouseButton.PRIMARY) {
+		randomOperator(e);}});
+
+
 		menui[0] = new CustomMenuItem(labeli[0]);
 		menui[1] = new CustomMenuItem(labeli[1]);
 		menui[2] = new SeparatorMenuItem();
@@ -244,10 +250,11 @@ public class OperatorPanel extends Pane
 		menui[4] = new CustomMenuItem(labeli[3]);
 		menui[5] = new SeparatorMenuItem();
 		menui[6] = new CustomMenuItem(labeli[4]);
+		menui[7] = new CustomMenuItem(labeli[5]);
 		menu = new ContextMenu();
 		menu.getItems().addAll(menui);
-		
-			
+
+
 		this.addEventHandler(MouseEvent.MOUSE_CLICKED, e-> editMenu(e));
 
 
@@ -257,26 +264,47 @@ public class OperatorPanel extends Pane
 		if(e.getButton() == MouseButton.SECONDARY ) {
 			menu.show(this,e.getScreenX(),e.getScreenY());
 		}
-	
+
 	}
-	
-	
+
+
+	void randomOperator(MouseEvent e) {
+		Random random = new Random();
+
+		operatorAtk = random.nextInt(12)+3;
+		operatorDecy = random.nextInt(8);
+		operatorSus = random.nextInt(10);
+		operatorSl = random.nextInt(10);
+		operatorRel = random.nextInt(10);
+		operatorMul = random.nextInt(15);
+		operatorTlv = random.nextInt(45);
+		int no = random.nextInt(29);
+		if(no >=15)no++;
+		if(no >=24)no++;
+		operatorWave = no;
+
+		allNotify();
+
+	}
+
+
+
 	void adsrCopy(MouseEvent e) {
 		 operatorAtk = (int)(sliderAtk.getValue()+0.0);
 		 operatorDecy = (int)(sliderDec.getValue()+0.0);
 		 operatorSus = (int)(sliderSus.getValue()+0.0);
 		 operatorSl  = (int)(sliderSl.getValue()+0.0);
-		 operatorRel = (int)(sliderRel.getValue()+0.0);		
-		
+		 operatorRel = (int)(sliderRel.getValue()+0.0);
+
 	}
-	
+
 	void adsrPaste(MouseEvent e) {
-		
+
 		adsrNotify();
-		
+
 	}
 	void editCopy(MouseEvent e) {
-		
+
 		 operatorAtk = (int)(sliderAtk.getValue()+0.0);
 		 operatorDecy = (int)(sliderDec.getValue()+0.0);
 		 operatorSus = (int)(sliderSus.getValue()+0.0);
@@ -288,24 +316,24 @@ public class OperatorPanel extends Pane
 		 operatorKsl = (int)(sliderKSL.getValue()+0.0);
 		 operatorDam = (int)(sliderDAM.getValue()+0.0);
 		 operatorDvb = (int)(sliderDVB.getValue()+0.0);
-		
+
 		 operatorEam = eamRadioButton.isSelected() == true ? 1:0;
 		 operatorEvb = evbRadioButton.isSelected() == true ? 1:0;
 		 operatorKsr = ksrRadioButton.isSelected() == true ? 1:0;
 		 operatorXof = xofRadioButton.isSelected() == true ? 1:0;
 		 operatorWave = options.indexOf(    waveSelect.getValue());
-		// operatorFb = 
+		// operatorFb =
 	}
-	
+
 	void editPaste(MouseEvent e) {
 
 		allNotify();
 
 	}
-	
+
 	void editClear(MouseEvent e) {
-		
-	 
+
+
 
 		sliderAtk.setValue(defaultAtk+0.0);
 		sliderDec.setValue(defaultDecy+0.0);
@@ -319,16 +347,16 @@ public class OperatorPanel extends Pane
 		sliderDAM.setValue(defaultDam+0.0);
 		sliderDVB.setValue(defaultDvb+0.0);
 		setWave(defaultWave);
-		
+
 		eamRadioButton.setSelected(defaultEam == 1 ? true:false);
 		evbRadioButton.setSelected(defaultEvb == 1 ? true:false);
 		ksrRadioButton.setSelected(defaultKsr == 1 ? true:false);
 		xofRadioButton.setSelected(defaultXof == 1 ? true:false);
-		
-		
-		
-		
-		
+
+
+
+
+
 		changeValue(defaultAtk,eventSource.Atck);
 		changeValue(defaultDecy,eventSource.Decy);
 		changeValue(defaultSl,eventSource.SL);
@@ -340,7 +368,7 @@ public class OperatorPanel extends Pane
 		changeValue(defaultKsl,eventSource.Ksl);
 		changeValue(defaultDam,eventSource.Dam);
 		changeValue(defaultDvb,eventSource.Dvb);
-		
+
 		changeValue(defaultEam,eventSource.EAM);
 		changeValue(defaultEvb,eventSource.EVB);
 		changeValue(defaultKsr,eventSource.Ksr);
@@ -348,23 +376,23 @@ public class OperatorPanel extends Pane
 		changeValue(defaultWave,eventSource.Wave);
 
 	}
-	
-	
+
+
 	void adsrNotify() {
 		sliderAtk.setValue(operatorAtk+0.0);
 		sliderDec.setValue(operatorDecy+0.0);
 		sliderSus.setValue(operatorSus+0.0);
 		sliderSl.setValue(operatorSus+0.0);
 		sliderRel.setValue(operatorRel+0.0);
-		
+
 		changeValue(operatorAtk,eventSource.Atck);
 		changeValue(operatorDecy,eventSource.Decy);
 		changeValue(operatorSl,eventSource.SL);
 		changeValue(operatorSus,eventSource.Sus);
 		changeValue(operatorRel,eventSource.Rel);
 	}
-	
-	
+
+
 	void allNotify() {
 		sliderAtk.setValue(operatorAtk+0.0);
 		sliderDec.setValue(operatorDecy+0.0);
@@ -378,16 +406,16 @@ public class OperatorPanel extends Pane
 		sliderDAM.setValue(operatorDam+0.0);
 		sliderDVB.setValue(operatorDvb+0.0);
 		setWave(operatorWave);
-		
-		eamRadioButton.setSelected(operatorEam == 1?true:false);
-		evbRadioButton.setSelected(operatorEvb == 1?true:false);
-		ksrRadioButton.setSelected(operatorKsr == 1?true:false);
-		xofRadioButton.setSelected(operatorXof == 1?true:false);
-		
-		
-		
-		
-		
+
+//		eamRadioButton.setSelected(operatorEam == 1?true:false);
+//		evbRadioButton.setSelected(operatorEvb == 1?true:false);
+//		ksrRadioButton.setSelected(operatorKsr == 1?true:false);
+//		xofRadioButton.setSelected(operatorXof == 1?true:false);
+
+
+
+
+
 		changeValue(operatorAtk,eventSource.Atck);
 		changeValue(operatorDecy,eventSource.Decy);
 		changeValue(operatorSl,eventSource.SL);
@@ -399,17 +427,17 @@ public class OperatorPanel extends Pane
 		changeValue(operatorKsl,eventSource.Ksl);
 		changeValue(operatorDam,eventSource.Dam);
 		changeValue(operatorDvb,eventSource.Dvb);
-		
+
 		changeValue(operatorEam,eventSource.EAM);
 		changeValue(operatorEvb,eventSource.EVB);
 		changeValue(operatorKsr,eventSource.Ksr);
 		changeValue(operatorXof,eventSource.XOF);
 		changeValue(operatorWave,eventSource.Wave);
-														
-	}
-	
 
-	
+	}
+
+
+
 	@FXML
 	void eamSelect(){
 		int i;
