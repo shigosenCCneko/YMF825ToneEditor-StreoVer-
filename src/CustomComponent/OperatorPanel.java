@@ -407,10 +407,10 @@ public class OperatorPanel extends Pane
 		sliderDVB.setValue(operatorDvb+0.0);
 		setWave(operatorWave);
 
-//		eamRadioButton.setSelected(operatorEam == 1?true:false);
-//		evbRadioButton.setSelected(operatorEvb == 1?true:false);
-//		ksrRadioButton.setSelected(operatorKsr == 1?true:false);
-//		xofRadioButton.setSelected(operatorXof == 1?true:false);
+		eamRadioButton.setSelected(operatorEam == 1?true:false);
+		evbRadioButton.setSelected(operatorEvb == 1?true:false);
+		ksrRadioButton.setSelected(operatorKsr == 1?true:false);
+		xofRadioButton.setSelected(operatorXof == 1?true:false);
 
 
 
