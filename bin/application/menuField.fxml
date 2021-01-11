@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.HBox?>
 
 <HBox fx:id="menuBarField" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MenuFieldController">
-	<MenuBar fx:id="menuBar" style="-fx-font-size: 12;">
+	<MenuBar fx:id="menuBar" prefHeight="26.0" prefWidth="328.0" style="-fx-font-size: 12;">
         <menus>
           <Menu mnemonicParsing="false" text="ToneSet">
             <items>
@@ -35,6 +35,8 @@
                   <MenuItem fx:id="copy12to34clear" mnemonicParsing="false" onAction="#copy12to34Clear" text="Copy (1,2)to(3,4)Clear" />
                   <MenuItem fx:id="copy12to23" mnemonicParsing="false" onAction="#copy12to23" text="Copy (1,2)to(2,3)" />
                   <MenuItem fx:id="copy1to234" mnemonicParsing="false" onAction="#copy1to234" text="Copy (1)to(2,3,4)" />
+               <MenuItem fx:id="copy123to234" mnemonicParsing="false" onAction="#copy123to234" text="Copy(123)to (234)" />
+               <MenuItem fx:id="copy234to123" mnemonicParsing="false" onAction="#copy234to123" text="Copy(234)to(123)" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem fx:id="viewSoftModulation" mnemonicParsing="false" onAction="#viewSoftwareModulation" text="View Software Modularion Pattern" />
                   <SeparatorMenuItem mnemonicParsing="false" />
@@ -48,6 +50,13 @@
                   <MenuItem fx:id="d8polyMode" mnemonicParsing="false" onAction="#d8polyMode" text="Double-Poly8" />
               </items>
             </Menu>
+         <Menu mnemonicParsing="false" text="Show intWave">
+           <items>
+             <MenuItem fx:id="show4in" mnemonicParsing="false" onAction="#show4in" text="show4in" />
+               <MenuItem fx:id="show3in" mnemonicParsing="false" onAction="#show3in" text="show3in" />
+               <MenuItem fx:id="restoreTone" mnemonicParsing="false" onAction="#restoreOp" text="restore" />
+           </items>
+         </Menu>
         </menus>
       </MenuBar>
 </HBox>

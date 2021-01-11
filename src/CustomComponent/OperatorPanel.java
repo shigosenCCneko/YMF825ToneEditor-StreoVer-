@@ -557,6 +557,12 @@ public class OperatorPanel extends Pane
 	public void addListener(MyDataListener listener) {
 		this.listener = listener;
 	}
+	
+	
+	public void  changeOperatorName(String name) {
+		operatorName.setText(name);
+		
 
+	}
 
 }

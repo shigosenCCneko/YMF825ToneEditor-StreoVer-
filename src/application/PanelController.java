@@ -215,7 +215,25 @@ public class PanelController implements MyDataListener , Observer{
 			return parent.currentChannel;
 		}		
 		
+		static public void prohibitChangeChannel() {
+			parent.channelSelectBox.setDisable(true);
+		}
+		static public void permitChangeChannel() {
+			parent.channelSelectBox.setDisable(false);;
+			
+		}
 		
+		static public void prohibitOp(int opno) {
+			parent.operatorArray[opno].setDisable(true);
+		}
+		static public void permitOp(int opno) {
+			parent.operatorArray[opno].setDisable(false);
+		}
+
+		static public void changeOpName(int opno,String name) {
+			parent.operatorArray[opno].changeOperatorName(name);
+
+		}
 		@FXML void changeAlgo() {
 			int i = algoOptions.indexOf(AlgoSelectBox.getValue());
 			if(i < 2) {
