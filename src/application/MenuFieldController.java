@@ -49,6 +49,8 @@ public class MenuFieldController {
 	@FXML MenuItem  viewSoftModulation;
 	@FXML MenuItem  reset;
 
+	@FXML MenuItem  viewTFFT;
+
 	@FXML MenuItem  monoMode;
 	@FXML MenuItem  polyMode;
 	@FXML MenuItem  d8polyMode;
@@ -74,6 +76,11 @@ public class MenuFieldController {
 	Stage	    softModuEditor;
 	String workDir;
 
+	FXMLLoader tFFTLoader;
+	Parent     tFFTRoot;
+	Stage      tFFTViewer;
+
+
 
 
 
@@ -91,6 +98,20 @@ public MenuFieldController() throws IOException{
 	softModuEditor.setOnCloseRequest((e) -> {
 	    e.consume(); // consume()でEventをストップ
 	});
+
+	tFFTLoader = new FXMLLoader(getClass().getResource("TfftView.fxml"));
+	tFFTRoot = (Parent)tFFTLoader.load();
+
+	tFFTViewer = new Stage();
+	tFFTViewer.setScene(new Scene(tFFTRoot));
+	tFFTViewer.setResizable(false);
+	tFFTViewer.setAlwaysOnTop(true);
+	tFFTViewer.setTitle("FFT");
+	tFFTViewer.setOnCloseRequest((e)->{
+		e.consume();
+	});
+
+
 
 }
 
@@ -427,6 +448,10 @@ public MenuFieldController() throws IOException{
 		softModuEditor.show();
 
 	}
+
+	@FXML void viewTFFT() {
+		tFFTViewer.show();
+	}
 	@FXML void resetYMF825() {
 		toneData.reset();
 
@@ -467,7 +492,7 @@ public MenuFieldController() throws IOException{
 		int data = buf[adr];
 		data = (data & 0x0003) | (val << 2);
 		buf[adr] = (byte)data;
-		
+
 		//toneData.setValue(eventSource.Tlv,PanelController.getPanelChannel(), opno,  val );
 	}
 
@@ -499,11 +524,11 @@ public MenuFieldController() throws IOException{
 			restoreOp();
 		}
 		if(intermidiateWaveState == -1) {
-			
+
 			byte buf[] = new byte[YMFConstants.DATA_LEN];
 			if(toneData.getAlgorithmNo(PanelController.getPanelChannel())== 4) {
 				intermidiateWaveState = 24;
-			
+
 				PanelController.prohibitChangeChannel();
 				PanelController.prohibitOp(0);
 				PanelController.prohibitOp(1);
@@ -512,12 +537,12 @@ public MenuFieldController() throws IOException{
 				PanelController.changeOpName(2,"■■ OP1 ■■");
 				PanelController.changeOpName(3,"■■ OP2 ■■");
 
-				
+
 
 				toneData.getToneData(PanelController.getPanelChannel(), buf);
 				tl2backup = getbackupTL(1,buf);
-				setTL(1,0,buf);		
-				
+				setTL(1,0,buf);
+
 				backupOperator(3,buf);
 				backupOperator(2,buf);
 				copyOp(0,2,buf);
@@ -533,7 +558,7 @@ public MenuFieldController() throws IOException{
 		if(intermidiateWaveState == 24) {
 			restoreOp();
 		}
-		
+
 		if(intermidiateWaveState ==-1) {
 
 			byte buf[] = new byte[YMFConstants.DATA_LEN];
@@ -553,7 +578,7 @@ public MenuFieldController() throws IOException{
 				PanelController.changeOpName(3,"■■ OP3 ■■");
 
 				toneData.getToneData(PanelController.getPanelChannel(),buf);
-				
+
 				tl3backup = getbackupTL(2,buf);
 				setTL(2,0,buf);
 				backupOperator(3,buf);
@@ -596,11 +621,11 @@ public MenuFieldController() throws IOException{
 
 		toneData.getToneData(PanelController.getPanelChannel(),buf);
 
-		
+
 		copyOp(1,0,buf);
 		copyOp(2,1,buf);
 		copyOp(3,2,buf);
-		setTL(2,tl3backup,buf);		
+		setTL(2,tl3backup,buf);
 		System.out.println(tl3backup);
 		restoreOperator(3,buf);
 
@@ -617,15 +642,15 @@ public MenuFieldController() throws IOException{
 		case 24:
 
 		toneData.getToneData(PanelController.getPanelChannel(),buf);
-	
-		
+
+
 		copyOp(2,0,buf);
 		copyOp(3,1,buf);
-		setTL(1,tl2backup,buf);			
+		setTL(1,tl2backup,buf);
 		restoreOperator(3,buf);
 		restoreOperator(2,buf);
-		
-		
+
+
 		toneData.setTone(PanelController.getPanelChannel(),buf);
 		PanelController.permitChangeChannel();
 		PanelController.permitOp(0);
@@ -641,7 +666,7 @@ public MenuFieldController() throws IOException{
 		case 3:
 
 		toneData.getToneData(PanelController.getPanelChannel(),buf);
-		setTL(3,tl4backup,buf);		
+		setTL(3,tl4backup,buf);
 		changeAlg(3,buf);
 		toneData.setTone(PanelController.getPanelChannel(),buf);
 		PanelController.permitChangeChannel();

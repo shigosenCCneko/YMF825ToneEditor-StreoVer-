@@ -6,7 +6,7 @@
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.layout.HBox?>
 
-<HBox fx:id="menuBarField" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MenuFieldController">
+<HBox fx:id="menuBarField" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MenuFieldController">
 	<MenuBar fx:id="menuBar" prefHeight="26.0" prefWidth="328.0" style="-fx-font-size: 12;">
         <menus>
           <Menu mnemonicParsing="false" text="ToneSet">
@@ -39,6 +39,7 @@
                <MenuItem fx:id="copy234to123" mnemonicParsing="false" onAction="#copy234to123" text="Copy(234)to(123)" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem fx:id="viewSoftModulation" mnemonicParsing="false" onAction="#viewSoftwareModulation" text="View Software Modularion Pattern" />
+               <MenuItem fx:id="viewTFFT" mnemonicParsing="false" onAction="#viewTFFT" text="FFT" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem fx:id="reset" mnemonicParsing="false" onAction="#resetYMF825" text="Reset" />
             </items>
