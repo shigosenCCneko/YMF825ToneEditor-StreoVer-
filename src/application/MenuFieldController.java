@@ -105,7 +105,7 @@ public MenuFieldController() throws IOException{
 	tFFTViewer = new Stage();
 	tFFTViewer.setScene(new Scene(tFFTRoot));
 	tFFTViewer.setResizable(false);
-	tFFTViewer.setAlwaysOnTop(true);
+	tFFTViewer.setAlwaysOnTop(false);
 	tFFTViewer.setTitle("FFT");
 	tFFTViewer.setOnCloseRequest((e)->{
 		e.consume();
