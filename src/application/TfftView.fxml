@@ -10,11 +10,11 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 
-<HBox prefHeight="450.0" prefWidth="1152.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.TfftViewController">
+<HBox prefHeight="450.0" prefWidth="1098.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.TfftViewController">
    <children>
-      <Pane layoutX="300.0" layoutY="300.0" prefHeight="450.0" prefWidth="1157.0">
+      <Pane layoutX="300.0" layoutY="300.0" prefHeight="450.0" prefWidth="1098.0">
          <children>
-            <Button fx:id="closeButton" layoutX="1091.0" layoutY="415.0" mnemonicParsing="false" onAction="#onCloseAction" text="Close" />
+            <Button fx:id="closeButton" layoutX="1033.0" layoutY="415.0" mnemonicParsing="false" onAction="#onCloseAction" text="Close" />
             <Button fx:id="testrecord" layoutX="21.0" layoutY="22.0" mnemonicParsing="false" onAction="#testRecord" text="Record" />
             <Button fx:id="testwrite" layoutX="114.0" layoutY="22.0" mnemonicParsing="false" onAction="#testWrite" text="Play" />
             <Canvas fx:id="canvas1" height="120.0" layoutX="30.0" layoutY="55.0" width="600.0" />
