@@ -103,11 +103,11 @@ public class TfftViewController implements Observer{
 	byte[] auBuf = new byte[stepSize * 2];
 	byte[] auBuf1 = new byte[stepSize * 2];
 	byte[] auBuf2 = new byte[stepSize * 2];
-	
+
 	byte[] readbuf;
 	byte[] writebuf;
-	
-	
+
+
 	int fftMag = 100;
 
 	class WaveRecord {
@@ -141,12 +141,13 @@ public class TfftViewController implements Observer{
 			fft = new int[N_WAVE];
 
 
+
 		}
 
 	}
 
-	
-	
+
+
 	@FXML void initialize(){
 		readbuf = auBuf1;
 		writebuf = auBuf2;
@@ -155,9 +156,9 @@ public class TfftViewController implements Observer{
 
 		gfft1 = fftCanvas1.getGraphicsContext2D();
 		gfft2 = fftCanvas2.getGraphicsContext2D();
-		
 
-		
+
+
 
 
 
@@ -258,7 +259,7 @@ public class TfftViewController implements Observer{
 	    	});
 
 
-	
+
 
 
 	}
@@ -431,7 +432,7 @@ public class TfftViewController implements Observer{
 		  realTimeFFTthread.exit();
 		  audioin.stop();
 		}
-		  
+
 		unsetFFTsync();
 		waveRecord(audioRec2,g2);
 
@@ -527,24 +528,24 @@ public class TfftViewController implements Observer{
 	  }else {
 
 		  realTimeFFTthread.exit();
-//		  
-		  audioin.stop(); 
-		 
+//
+		  audioin.stop();
+
 	  }
 
   }
-  
+
   class DataRead implements Runnable{
 
 	  public void run() {
 
 			  audioin.read(writebuf);
-			  
+
 
 	  }
-	  
 
-	  
+
+
   }
 
   class RealTimeFFT extends Thread {
@@ -554,28 +555,28 @@ public class TfftViewController implements Observer{
 	  WaveRecord rec = audioRec2;
 	  int writePos = 0;
 	//  int readBufSize = 256;
-	  
-	  
+
+
 
 //	  byte[] readBuf = new byte[stepSize *2];
 
 	  int [] source = new int[N_WAVE];
-	  int [] target = new int[N_WAVE];	  
-	  
+	  int [] target = new int[N_WAVE];
+
 	  public void exit() {
 			loopContinue = false;
-			
+
 	  }
 
 
 	  public void run() {
-		  
+
 
 		  DataRead dr = new DataRead();
 		  Thread t;
-		  
-		  
-		  
+
+
+
 //		  AudioInput in = new AudioInput(rec.audioBit,rec.audioChannel,rec.audioHz/FFTsampringMag*2);
 //in.start();
 		audioin = new AudioInput(rec.audioBit,rec.audioChannel,rec.audioHz/FFTsampringMag*2);
@@ -584,7 +585,7 @@ audioin.start();
 
 	  		//auin.read(readBuf);
 	  		t = new Thread(dr);
-	  		t.start();	
+	  		t.start();
 
 
 	  		int data;
@@ -594,7 +595,7 @@ audioin.start();
 	  			fftRecord[writePos++] = data;
 	  			//if(writePos == N_WAVE) writePos = 0;
 	  			writePos &= 0xfff;
-	  			
+
 	  		}
 	  		int p = writePos;
 	  		for(int i =0;i<N_WAVE;i++) {
@@ -614,19 +615,19 @@ audioin.start();
 	  	        source[i] =(int) Math.sqrt(j*j+k*k);
 	  	    }
 	  		gfft2.clearRect(0, 0, 530, 400);
-	 
+
 	  		DrawFFTLine drline = new DrawFFTLine();
 	  		drline.start(source);
 	  	    //gfft2.setFill(Color.BLACK);
-	  		//gfft2.fillRect(0, 0, 500, 180);	  
-	  	
+	  		//gfft2.fillRect(0, 0, 500, 180);
+
 //	  		int offset = 4;
 //	  		int a,b;
 //	  		int cnt = 0;
 //	  		for(int i = offset;i < (N_WAVE/2 -FFTviewStep-  -offset);i+= FFTviewStep) {
-//	  			
 //
-//	  			
+//
+//
 //	  			if(source[i+offset] > source[i+offset+1]) {
 //	  				a = source[i+offset];
 //	  			}else {
@@ -641,27 +642,27 @@ audioin.start();
 //	  				a = b;
 //	  			}
 //	  			a = (int) Math.sqrt((double)a * fftMag);
-//	  	    	
-//	  			
+//
+//
 //	  			// Line Draw
 //	  			if(a>175)a = 175;
 //	  			double c = Math.sqrt(a);
 //	  			gfft2.setStroke(new Color(c/13.3,0,(13.3-c)/13.3,1));
 //	  	    	gfft2.strokeLine(5+i/FFTviewStep, 175- a, 5+i/FFTviewStep, 175);
-//	  	  			
-//	  			
+//
+//
 //	  			cnt++;
 //	  			if(cnt > 400)break;
-//	  			
+//
 //	  		}
-	  		
-	  		
+
+
 	  		try {
 	  			t.join();
 	  		}catch(InterruptedException e) {
-	  			
+
 	  		}
-	  		
+
 	  		try {
 				this.sleep(fftDrawWaitTime);
 			} catch (InterruptedException e) {
@@ -671,28 +672,28 @@ audioin.start();
 	  		byte[] pre = readbuf;
 	  		readbuf = writebuf;
 	  		writebuf = pre;
-	  		
+
 
 	  	}
   			gfft2.setStroke( Color.BLACK);
 
 //-------
-audioin.stop(); 
+audioin.stop();
   }
 
   }
-  
-  
-  
+
+
+
   class DrawFFTLine{
 		int offset = 4;
 		int a,b;
 		int cnt = 0;
 		void start(int source[]) {
 		for(int i = offset;i < (N_WAVE/2 -FFTviewStep-  -offset);i+= FFTviewStep) {
-			
 
-			
+
+
 			if(source[i+offset] > source[i+offset+1]) {
 				a = source[i+offset];
 			}else {
@@ -707,18 +708,18 @@ audioin.stop();
 				a = b;
 			}
 			a = (int) Math.sqrt((double)a * fftMag);
-	    	
-			
+
+
 			// Line Draw
 			if(a>175)a = 175;
 			double c = Math.sqrt(a);
 			gfft2.setStroke(new Color(c/13.3,0,(13.3-c)/13.3,1));
 	    	gfft2.strokeLine(5+i/FFTviewStep, 175- a, 5+i/FFTviewStep, 175);
-	  			
-			
+
+
 			cnt++;
 			if(cnt > 400)break;
-			
+
 		}
 		}
   }
@@ -777,11 +778,11 @@ void drawFft(GraphicsContext g, int data[]) {
 	g.clearRect(0, 0, 530, 400);
 	int offset = 4;
 	int a,b;
-	
+
 	for(int i = 1;i < (N_WAVE-FFTviewStep-offset);i+= FFTviewStep) {
 //    	int fdata = (data[i+offset]+data[i+offset+1]+data[i+offset+2]+data[i+offset+3])/4;
 //		g.strokeLine(5+i/FFTviewStep, 110-fdata, 5+i/FFTviewStep, 110);
-		
+
 		if(data[i+offset] > data[i+offset+1]) {
 			a = data[i+offset];
 		}else {
@@ -795,14 +796,14 @@ void drawFft(GraphicsContext g, int data[]) {
 		if(a < b) {
 			a = b;
 		}
-a = (int) Math.sqrt((double)a * fftMag);  	
+a = (int) Math.sqrt((double)a * fftMag);
 if(a > 175) a = 175;
 	double c = Math.sqrt(a);
 	g.setStroke(new Color(c/13.3,0,(13.3-c)/13.3,1));
 
-		
+
     	g.strokeLine(5+i/FFTviewStep, 175- a, 5+i/FFTviewStep, 175);
-    	
+
 	}
 	g.setStroke(Color.BLACK);
 }
@@ -1122,16 +1123,16 @@ int SineWaveN_WAVE[] = {
 class RunFFT extends Thread{
 
 	  public void start(int fr[],int fi[]) {
-		  
+
 		  fix_fft2( fr,  fi);
 
-			  
-			  
+
+
 
 	  }
-	  
 
-	  
+
+
 
 
 
@@ -1202,11 +1203,11 @@ int fix_fft2(int fr[], int fi[])
       for (i = m; i < N_WAVE; i += istep) {
         j = i + l;
 
-   
+
         tr = (wr * fr[j] - wi * fi[j] + 64 ) >> 10;
         ti = (wr * fi[j] + wi * fr[j] + 64 ) >> 10;
 
-      
+
       	qr = fr[i];
         qi = fi[i];
 
