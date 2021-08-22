@@ -51,7 +51,7 @@ public class EnvelopeViewerController implements Observer {
 				{0,0,0,1},
 				{0,1,0,1},
 				{1,0,0,1},
-				{0,0,1,1}	};
+				{1,0,1,1}	};
 
 		private Ymf825ToneData toneData;
 
@@ -632,6 +632,8 @@ if(releaseRate[i] ==0) {
 	private int  fillRealEnvelope(int opNo,boolean isCareer, GraphicsContext g,double startX,double startY,double endX,double endY){
 
 		int pos;
+		
+	
 		double slope = (endY-startY)/(endX-startX);
 		double width = g.getLineWidth();
 		g.setLineWidth(1);

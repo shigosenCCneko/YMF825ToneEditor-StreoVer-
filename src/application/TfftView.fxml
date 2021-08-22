@@ -10,9 +10,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 
-<HBox prefHeight="450.0" prefWidth="1098.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.TfftViewController">
+<HBox fx:id="fftHBox" prefHeight="450.0" prefWidth="1141.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.TfftViewController">
    <children>
-      <Pane layoutX="300.0" layoutY="300.0" prefHeight="450.0" prefWidth="1098.0">
+      <Pane fx:id="fftPane" layoutX="300.0" layoutY="300.0" prefHeight="450.0" prefWidth="1142.0">
          <children>
             <Button fx:id="closeButton" layoutX="1033.0" layoutY="415.0" mnemonicParsing="false" onAction="#onCloseAction" text="Close" />
             <Button fx:id="testrecord" layoutX="21.0" layoutY="22.0" mnemonicParsing="false" onAction="#testRecord" text="Record" />
@@ -27,8 +27,8 @@
             <Button fx:id="testwrite2" layoutX="110.0" layoutY="227.0" mnemonicParsing="false" onAction="#testWrite2" text="Play" />
             <Slider fx:id="magSlider2" layoutX="216.0" layoutY="225.0" value="50.0" />
             <Slider fx:id="positionSlider2" layoutX="114.0" layoutY="403.0" max="40000.0" prefHeight="14.0" prefWidth="260.0" />
-            <Canvas fx:id="fftCanvas1" height="180.0" layoutX="640.0" layoutY="40.0" width="450.0" />
-            <Canvas fx:id="fftCanvas2" height="180.0" layoutX="640.0" layoutY="230.0" width="450.0" />
+            <Canvas fx:id="fftCanvas1" height="180.0" layoutX="640.0" layoutY="32.0" width="450.0" />
+            <Canvas fx:id="fftCanvas2" height="180.0" layoutX="640.0" layoutY="237.0" width="450.0" />
             <Slider fx:id="fftSlider1" layoutX="383.0" layoutY="168.0" max="40000.0" prefHeight="14.0" prefWidth="253.0" />
             <Slider fx:id="fftSlider2" layoutX="392.0" layoutY="403.0" max="40000.0" prefHeight="14.0" prefWidth="253.0" />
             <RadioButton fx:id="syncFFT" layoutX="700.0" layoutY="423.0" mnemonicParsing="false" onAction="#setFFTsync" text="FFT Pos Sync 1ch" />
@@ -52,6 +52,10 @@
             <Label fx:id="mag1" layoutX="368.0" layoutY="14.0" text="50" />
             <Label fx:id="mag2" layoutX="360.0" layoutY="224.0" text="50" />
             <RadioButton fx:id="realTimeFFT" layoutX="884.0" layoutY="423.0" mnemonicParsing="false" onAction="#realTimeFft" text="RealTImeFFT" />
+            <Slider fx:id="fftMagSlider1" layoutX="1107.0" layoutY="45.0" max="200.0" min="5.0" orientation="VERTICAL" value="100.0" />
+            <Slider fx:id="fftMagSlider2" layoutX="1107.0" layoutY="250.0" max="200.0" min="5.0" orientation="VERTICAL" value="100.0" />
+            <RadioButton fx:id="tfftButton1" layoutX="964.0" layoutY="13.0" mnemonicParsing="false" onAction="#tfftDraw1" text=" TFFT Draw 1" />
+            <RadioButton fx:id="tfftButton2" layoutX="964.0" layoutY="215.0" mnemonicParsing="false" onAction="#tfftDraw2" text="TFFT Draw 2" />
          </children></Pane>
    </children>
 </HBox>
