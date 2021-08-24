@@ -1,5 +1,8 @@
 package application;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -37,13 +40,6 @@ public class TfftViewController implements Observer{
 
 
 
-
-
-
-
-
-
-
 	GraphicsContext g1;
 	GraphicsContext g2;
 	GraphicsContext gfft1;
@@ -59,6 +55,7 @@ public class TfftViewController implements Observer{
 
 	@FXML Canvas canvas1;
 	@FXML Canvas canvas2;
+	@FXML RadioButton realTimeWave;
 
 	@FXML Canvas fftCanvas1;
 	@FXML Canvas fftCanvas2;
@@ -89,6 +86,9 @@ public class TfftViewController implements Observer{
 
 
 
+	@FXML Button dataWrite;
+
+
 	final int SAMPRING_RATE = 44000;
 	final int viewCenter = 300;
 	final int N_WAVE = 4096;
@@ -100,16 +100,20 @@ public class TfftViewController implements Observer{
 //	int sqrtTable[][];
 
 
+	RealTimeWave realTimeWavethread;
+
 
 	int FFTsampringMag =4;
-	  RealTimeFFT realTimeFFTthread;
-	  RunFFT runFFT;
+	RealTimeFFT realTimeFFTthread;
+	RunFFT runFFT;
 
 
 	WaveRecord audioRec1 = new WaveRecord(16,1,SAMPRING_RATE,2.0);
 	WaveRecord audioRec2 = new WaveRecord(16,1,SAMPRING_RATE,2.0);
 	boolean syncFFTchannel = false;
 	int syncFFToffset = 0;
+
+
 
 	final   int BasicStepSize = 2048;
 	int stepSize = BasicStepSize;
@@ -121,6 +125,7 @@ public class TfftViewController implements Observer{
 
 	byte[] readbuf;
 	byte[] writebuf;
+
 
 
 	final int defaultfftMag = 100;
@@ -159,10 +164,7 @@ public class TfftViewController implements Observer{
 			fttStartPos = 0;
 			fft = new int[N_WAVE];
 
-
-
 		}
-
 	}
 
 
@@ -185,14 +187,13 @@ public class TfftViewController implements Observer{
 		}
 
 		int sqri,sqrj,data;
-
-//		sqrtTable = new int[4096][4096];
+//		sqrtTable = new int[5000][5000];
 //		for(sqri = 0; sqri < 4096;sqri++) {
 //			for(sqrj = 0;sqrj < 4096;sqrj++) {
 //				sqrtTable[sqri][sqrj] = (int)Math.sqrt(sqri*sqri + sqrj*sqrj);
 //			}
 //		}
-//
+
 
 
 
@@ -244,14 +245,14 @@ public class TfftViewController implements Observer{
 
 	    			audioRec1.waveMag = new_val.intValue()+1;
 	    			changeMag(audioRec1,g1);
-	    	});
+	    		});
 
 		yMagSlider1.valueProperty().addListener((
 	        	ObservableValue<? extends Number> ov,Number old_val,
 	    		Number new_val) ->{
 	    			audioRec1.waveYMag = new_val.doubleValue()+1;
 	    			changeYMag(audioRec1,g1);
-	    	});
+	    		});
 
 		fftSlider1.valueProperty().addListener((
 	        	ObservableValue<? extends Number> ov,Number old_val,
@@ -260,7 +261,7 @@ public class TfftViewController implements Observer{
 	    			waveFft(audioRec1,gfft1);
 
 
-	    	});
+	    		});
 
 
 
@@ -274,8 +275,7 @@ public class TfftViewController implements Observer{
 	    				waveFft(audioRec1,gfft1);
 	    			}
 
-
-	    	});
+	    		});
 
 
 
@@ -289,12 +289,12 @@ public class TfftViewController implements Observer{
 	    		Number new_val) ->{
 	    			audioRec2.wavePosition = new_val.intValue();
 	    			changePosition(audioRec2,g2);
-	    	});
+	    		});
 
 
 		magSlider2.valueProperty().addListener((
 	        	ObservableValue<? extends Number> ov,Number old_val,
-	    		Number new_val) ->{
+	        	Number new_val) ->{
 
 	    			int premag = old_val.intValue();
 	    			int mag = new_val.intValue();
@@ -309,7 +309,7 @@ public class TfftViewController implements Observer{
 
 	    			audioRec2.waveMag = new_val.intValue()+1;
 	    			changeMag(audioRec2,g2);
-	    	});
+	    		});
 
 		yMagSlider2.valueProperty().addListener((
 	        	ObservableValue<? extends Number> ov,Number old_val,
@@ -343,54 +343,10 @@ public class TfftViewController implements Observer{
 	    			}else {
 	    				waveFft(audioRec2,gfft2);
 	    			}
-	    			
-
 
 	    	});
 
-
-
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -449,6 +405,9 @@ public class TfftViewController implements Observer{
 			}
 		}
 
+
+
+
 		void start() {
 			try {
 				dataline.open(fmt);
@@ -458,6 +417,8 @@ public class TfftViewController implements Observer{
 			dataline.start();
 			inputStream = new AudioInputStream(dataline);
 		}
+
+
 
 		int read(byte[] buf) {
 			return read(buf  ,0,buf.length);
@@ -527,12 +488,17 @@ public class TfftViewController implements Observer{
 		}
 		unsetFFTsync();
 		waveRecord(audioRec1,g1);
-
-		waveFft(audioRec1,gfft1);
+		if(tfftButton1.isSelected()) {
+			waveFft2(audioRec1,gfft1);
+		}else {
+			waveFft(audioRec1,gfft1);
+		}
 
 
 
 	}
+
+
 
 	@FXML void testRecord2(){
 		if(realTimeFFTthread != null) {
@@ -551,6 +517,8 @@ public class TfftViewController implements Observer{
 
 	}
 
+
+
 	void waveRecord(WaveRecord rec ,GraphicsContext g) {
 		byte [] buf = rec.audioBuf;
 		AudioInput in = new AudioInput(rec.audioBit,rec.audioChannel,rec.audioHz);
@@ -563,16 +531,22 @@ public class TfftViewController implements Observer{
 
 	}
 
+
+
 	void changePosition(WaveRecord rec, GraphicsContext g) {
 			waveClear(g);
 		drawWave(rec,g);
 	}
+
+
 
 	void changeMag(WaveRecord rec, GraphicsContext g){
 		waveClear(g);
 		drawWave(rec,g);
 
 	}
+
+
 
 	private void changeYMag(WaveRecord rec, GraphicsContext g) {
 		waveClear(g);
@@ -593,27 +567,27 @@ public class TfftViewController implements Observer{
 		for(int i = rec.wavePosition * 2;i < size ;i+= rec.waveMag * 2) {
 			int data = ( (int)(buf[i+1] <<8) | (0x00ff & buf[i]));
 
-
 			data /= rec.waveYMag;
 
 			g.strokeLine(px, pdata+60, x, data+60);
 			pdata = data;
 			px = x;
 			x+= 1;
-
-
 		}
 	}
+
 
 	@FXML void testWrite() {
 		waveWrite(audioRec1);
 	}
 
 
+
 	@FXML void testWrite2() {
 		waveWrite(audioRec2);
 
 	}
+
 
 	void waveWrite(WaveRecord rec) {
 		AudioOutput out = new AudioOutput(rec.audioBit,rec.audioChannel,rec.audioHz);
@@ -647,14 +621,149 @@ public class TfftViewController implements Observer{
 
   }
 
+  @FXML void realTimeRaveRun() {
+
+	  if(realTimeWave.isSelected()) {
+		  if(realTimeFFTthread != null) {
+			  realTimeFFTthread.exit();
+			  audioin.stop();
+			  realTimeFFT.setSelected(false);
+
+
+		  }
+
+		  realTimeWavethread = new RealTimeWave();
+		  realTimeWavethread.start();
+
+	  }else {
+
+		  realTimeWavethread.exit();
+//
+		  audioin.stop();
+//			if(tfftButton2.isSelected() && (realTimeFFT.isSelected() == false)) {
+//				waveFft2(audioRec2,gfft2);
+//			}else {
+//				waveFft(audioRec2,gfft2);
+//			}
+	  }
+
+  }
+
+
+
+
+  class RealTimeWave extends Thread {
+	  boolean loopContinue = true;
+	  int[] fftRecord = new int[4096];
+	  int readChannel = 0;
+	  WaveRecord rec = audioRec2;
+	  int writePos = 0;
+
+
+	  public void exit() {
+			loopContinue = false;
+
+	  }
+
+
+	  public void run() {
+
+
+		  DataRead dr = new DataRead();
+		  Thread t;
+
+
+		audioin = new AudioInput(rec.audioBit,rec.audioChannel,rec.audioHz/FFTsampringMag*2);
+		audioin.start();
+
+	  		while(loopContinue) {
+
+	  		g2.clearRect(0, 0, 200, 200);
+	  		//auin.read(readBuf);
+	  		t = new Thread(dr);
+	  		t.start();
+
+
+
+			int px = 0;
+			int pdata = 0;
+			int x = 0;
+			for(int i = 0;i < stepSize * 2 ;i+= 2) {
+				int data = ( (int)(readbuf[i+1] <<8) | (0x00ff & readbuf[i]));
+
+				data /= rec.waveYMag;
+
+				g2.strokeLine(px, pdata+60, x, data+60);
+				pdata = data;
+				px = x;
+				x+= 1;
+				if(x > 200) {
+					break;
+				}
+			}
+
+
+	  		try {
+	  			t.join();
+	  		}catch(InterruptedException e) {
+
+	  		}
+
+
+
+
+	  		try {
+				Thread.sleep(4);
+			} catch (InterruptedException e) {
+				// TODO 自動生成された catch ブロック
+				e.printStackTrace();
+			}
+
+
+	  		byte[] pre = readbuf;
+	  		readbuf = writebuf;
+	  		writebuf = pre;
+
+
+	  	}
+  			gfft2.setStroke( Color.BLACK);
+
+
+  			audioin.stop();
+  			try {
+				this.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO 自動生成された catch ブロック
+				e.printStackTrace();
+			}
+	  }
+
+  }
+
+
+
+
+
+
+
+
+
+
 // FFT 別スレッド -------------------------------------------------
 
 
   @FXML void realTimeFft(){
 	  if(realTimeFFT.isSelected()) {
+		  if(realTimeWavethread != null) {
+			  realTimeWavethread.exit();
+			  audioin.stop();
+
+			  realTimeWave.setSelected(false);
+		  }
+
+
 		  realTimeFFTthread = new RealTimeFFT();
 		  realTimeFFTthread.start();
-
 
 	  }else {
 
@@ -666,23 +775,19 @@ public class TfftViewController implements Observer{
 			}else {
 				waveFft(audioRec2,gfft2);
 			}
-
 	  }
-
   }
+
 
   class DataRead implements Runnable{
 
 	  public void run() {
 
 			  audioin.read(writebuf);
-
-
 	  }
-
-
-
   }
+
+
 
   class RealTimeFFT extends Thread {
 	  boolean loopContinue = true;
@@ -705,6 +810,7 @@ public class TfftViewController implements Observer{
 	  }
 
 
+
 	  public void run() {
 
 
@@ -722,6 +828,7 @@ audioin.start();
 	  		//auin.read(readBuf);
 	  		t = new Thread(dr);
 	  		t.start();
+
 
 
 	  		int data;
@@ -759,6 +866,7 @@ audioin.start();
 //	  	        if(j < 0)j = -j;
 //	  	        if(k <0) k = -k;
 //	  	        source[i] = sqrtTable[j][k];
+
 	  	        source[i] =(int) Math.sqrt(j*j+k*k);
 	  	    }
 
@@ -800,6 +908,12 @@ audioin.start();
 
 //-------
 audioin.stop();
+try {
+	this.sleep(100);
+} catch (InterruptedException e) {
+	// TODO 自動生成された catch ブロック
+	e.printStackTrace();
+}
   }
 
   }
@@ -848,26 +962,6 @@ audioin.stop();
 					}
 
 				}
-
-
-
-
-//				if(source[i+offset] > source[i+offset+1]) {
-//					max = source[i+offset];
-//				}else {
-//					max = source[i+offset+1];
-//				}
-//				if(source[i+offset+2] > source[i+offset+3]) {
-//					b = source[i+offset+2];
-//				}else {
-//					b = source[i+offset+3];
-//				}
-//				if(max < b) {
-//					max = b;
-//				}
-
-
-
 
 
 
@@ -953,6 +1047,62 @@ audioin.stop();
 
 }
 
+
+
+
+@FXML void fftDataWrite() {
+
+
+  // data test save
+	WaveRecord rec;
+	rec = audioRec2;
+
+  File file = new File("C:\\Users\\Keiji\\Desktop\\fftData\\fftdata.txt");
+  FileWriter filewriter = null;
+	try {
+		filewriter = new FileWriter(file);
+	} catch (IOException e) {
+		// TODO 自動生成された catch ブロック
+		e.printStackTrace();
+	}
+  BufferedWriter bw = new BufferedWriter(filewriter);
+
+  String str;
+  int d;
+  for(int i =0; i < N_WAVE/2;i++) {
+  	d = rec.fft[i];
+  	str =(Integer.valueOf(d).toString()+",");
+  	try {
+			bw.write(str);
+			bw.newLine();
+		} catch (IOException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+
+  }
+
+  try {
+		bw.close();
+		System.out.println("file close");
+	} catch (IOException e) {
+		// TODO 自動生成された catch ブロック
+		e.printStackTrace();
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 void drawFft(GraphicsContext g, int data[],int fftMag) {
 	g.clearRect(0, 0, 530, 400);
 	int offset = 4;
@@ -1014,6 +1164,42 @@ void waveFft(WaveRecord rec, GraphicsContext g) {
     drawFft(g,rec.fft,rec.fftYMag);
 
 
+
+//    // data test save
+//
+//    File file = new File("C:\\Users\\Keiji\\Desktop\\fftData\\fftdata.txt");
+//    FileWriter filewriter = null;
+//	try {
+//		filewriter = new FileWriter(file);
+//	} catch (IOException e) {
+//		// TODO 自動生成された catch ブロック
+//		e.printStackTrace();
+//	}
+//    BufferedWriter bw = new BufferedWriter(filewriter);
+//
+//    String str;
+//    int d;
+//    for(int i =0; i < N_WAVE/2;i++) {
+//    	d = rec.fft[i];
+//    	str =(Integer.valueOf(d).toString()+",");
+//    	try {
+//			bw.write(str);
+//			bw.newLine();
+//		} catch (IOException e) {
+//			// TODO 自動生成された catch ブロック
+//			e.printStackTrace();
+//		}
+//
+//    }
+//
+//    try {
+//		bw.close();
+//		System.out.println("file close");
+//	} catch (IOException e) {
+//		// TODO 自動生成された catch ブロック
+//		e.printStackTrace();
+//	}
+
 }
 
 
@@ -1042,13 +1228,12 @@ void waveFft2(WaveRecord rec,GraphicsContext g) {
 		runFFT = new RunFFT();
 		runFFT.start(source,target);
     	int j,k;
-    for (int i = 0; i <  (N_WAVE/2) ; i++) {
+    	for (int i = 0; i <  (N_WAVE/2) ; i++) {
 
-        j = source[i];
-        k = target[i] ;
-        source[i] =(int) Math.sqrt(j*j+k*k);
-    }
-
+    		j = source[i];
+    		k = target[i] ;
+    		source[i] =(int) Math.sqrt(j*j+k*k);
+    	}
 
 
     	int a,b,c,d,max,offset;
@@ -1098,16 +1283,7 @@ void waveFft2(WaveRecord rec,GraphicsContext g) {
 			}
 
 
-
-
-
-
     		int index = max * rec.fftYMag;
-
-
-
-
-			//int index = a * realtimefftMag;
 			if(index > 30624) {
 				index = 30624;
 			}
@@ -1127,28 +1303,10 @@ void waveFft2(WaveRecord rec,GraphicsContext g) {
 		g.strokeLine(5+i/FFTviewStep, ypos, 5+i/FFTviewStep, ypos+1);
 
 
-
     	}
 		pos += 400;
-
 	}
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -39,7 +39,6 @@ public class Panel extends Application
        primaryStage.addEventHandler(WindowEvent.WINDOW_SHOWN ,new EventHandler<WindowEvent>() {
      	   @Override
      	   public void handle(WindowEvent window) {
-     
 
      	   }	
         });	 
@@ -74,9 +73,7 @@ public class Panel extends Application
         primaryStage.setScene( scene );
         primaryStage.show();
         
-        
-
- 
+  
     }
     @Override
     public void stop() {

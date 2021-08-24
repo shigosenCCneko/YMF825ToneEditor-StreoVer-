@@ -9,6 +9,7 @@
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
 
 <HBox fx:id="fftHBox" prefHeight="450.0" prefWidth="1141.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.TfftViewController">
    <children>
@@ -56,6 +57,12 @@
             <Slider fx:id="fftMagSlider2" layoutX="1107.0" layoutY="250.0" max="200.0" min="5.0" orientation="VERTICAL" value="100.0" />
             <RadioButton fx:id="tfftButton1" layoutX="964.0" layoutY="13.0" mnemonicParsing="false" onAction="#tfftDraw1" text=" TFFT Draw 1" />
             <RadioButton fx:id="tfftButton2" layoutX="964.0" layoutY="215.0" mnemonicParsing="false" onAction="#tfftDraw2" text="TFFT Draw 2" />
+            <RadioButton fx:id="realTimeWave" layoutX="169.0" layoutY="423.0" mnemonicParsing="false" onAction="#realTimeRaveRun" text="Real Time Wave" />
+            <Button fx:id="dataWrite" layoutX="601.0" layoutY="421.0" mnemonicParsing="false" onAction="#fftDataWrite" text="FFT Data Write">
+               <font>
+                  <Font size="10.0" />
+               </font>
+            </Button>
          </children></Pane>
    </children>
 </HBox>
