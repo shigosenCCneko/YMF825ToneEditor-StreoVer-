@@ -1,9 +1,16 @@
 package application;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.sound.sampled.AudioFormat;
@@ -14,6 +21,7 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.TargetDataLine;
 
+import DataClass.Ymf825ToneData;
 import MyEvent.MyDataEvent;
 import MyEvent.Observer;
 import MyEvent.eventSource;
@@ -87,7 +95,9 @@ public class TfftViewController implements Observer{
 
 
 	@FXML Button dataWrite;
-
+	@FXML Button fftSerch;
+	@FXML Button nextSerchData;
+	@FXML Label surchDataNo;
 
 	final int SAMPRING_RATE = 44000;
 	final int viewCenter = 300;
@@ -113,6 +123,12 @@ public class TfftViewController implements Observer{
 	boolean syncFFTchannel = false;
 	int syncFFToffset = 0;
 
+
+
+	//音色検索セット
+	int candidataVal = 0;
+	List <OpeCandi> candidate = new ArrayList<OpeCandi>();
+	int opIndex = 0;
 
 
 	final   int BasicStepSize = 2048;
@@ -633,6 +649,7 @@ public class TfftViewController implements Observer{
 		  }
 
 		  realTimeWavethread = new RealTimeWave();
+		  realTimeWavethread.setPriority(Thread.MAX_PRIORITY);
 		  realTimeWavethread.start();
 
 	  }else {
@@ -763,6 +780,7 @@ public class TfftViewController implements Observer{
 
 
 		  realTimeFFTthread = new RealTimeFFT();
+		  realTimeFFTthread.setPriority(Thread.MAX_PRIORITY);
 		  realTimeFFTthread.start();
 
 	  }else {
@@ -908,12 +926,12 @@ audioin.start();
 
 //-------
 audioin.stop();
-try {
-	this.sleep(100);
-} catch (InterruptedException e) {
-	// TODO 自動生成された catch ブロック
-	e.printStackTrace();
-}
+	try {
+		this.sleep(100);
+	} catch (InterruptedException e) {
+		// TODO 自動生成された catch ブロック
+		e.printStackTrace();
+	}
   }
 
   }
@@ -1028,383 +1046,959 @@ try {
   }
 
 
-  void unsetFFTsync() {
-	  syncFFT.setSelected(false);
-	  syncFFTchannel = false;
+	  void unsetFFTsync() {
+		  syncFFT.setSelected(false);
+		  syncFFTchannel = false;
+	
+		  	
+	  }
 
+	@FXML void setFFTsync() {
+		if(syncFFT.isSelected() ) {
+			syncFFTchannel = true;
+			syncFFToffset = (int) (fftSlider1.getValue() - fftSlider2.getValue());
+		}else {
+			syncFFTchannel = false;
+			syncFFToffset = 0;
+		}
+	
+	
+	}
 
-  }
-
-@FXML void setFFTsync() {
-	if(syncFFT.isSelected() ) {
-		syncFFTchannel = true;
-		syncFFToffset = (int) (fftSlider1.getValue() - fftSlider2.getValue());
-	}else {
-		syncFFTchannel = false;
-		syncFFToffset = 0;
+	class OpeCandi{
+		double difference;
+	
+		int alg;
+		int mulop1;
+		int mulop2;
+		int mulop3;
+		int mulop4;
+	
+		int tlvop1;
+		int tlvop2;
+		int tlvop3;
+		int tlvop4;
+	
+	
 	}
 
 
-}
+	void setOpTlData(int ch ,int opIndex) {
+	
+		Ymf825ToneData  toneData;
+		toneData = Ymf825ToneData.getInstance();
+		
+			
+		toneData.setValue(eventSource.Connect, ch, 0,candidate.get(opIndex).alg);
+
+		toneData.setValue(eventSource.Mul, ch, 0, candidate.get(opIndex).mulop1);
+		toneData.setValue(eventSource.Mul, ch, 1, candidate.get(opIndex).mulop2);
+		toneData.setValue(eventSource.Mul, ch, 2, candidate.get(opIndex).mulop3);
+		toneData.setValue(eventSource.Mul, ch, 3, candidate.get(opIndex).mulop4);
+
+		toneData.setValue(eventSource.Tlv, ch, 0, candidate.get(opIndex).tlvop1);
+		toneData.setValue(eventSource.Tlv, ch, 1, candidate.get(opIndex).tlvop2);
+		toneData.setValue(eventSource.Tlv, ch, 2, candidate.get(opIndex).tlvop3);
+		toneData.setValue(eventSource.Tlv, ch, 3, candidate.get(opIndex).tlvop4);
 
 
+		byte [] tbuf = new byte[32];
+		toneData.get_tonememory(0, tbuf);
+		toneData.setTone(0,  tbuf);	  //値をPanelに標示
+		surchDataNo.setText(    Integer.toString(opIndex)      );
+	}
 
 
-@FXML void fftDataWrite() {
+	@FXML void nextSercDataSet() {
+			opIndex++;
+			if(opIndex>4) {
+				opIndex = 0;
+			}
+			setOpTlData(0,opIndex);
+	
+	
+	}
+	
+	
+	/*  ----------------------        候補音色の検索------------------		*/
 
+	@FXML void fftSarchPara() {
+	
+	
+	
 
-  // data test save
-	WaveRecord rec;
-	rec = audioRec2;
+	    //ノイズ除去
+		WaveRecord rec;
+		rec = audioRec1;
+		
+		int dat[] = new int[N_WAVE/4];
+		for(int i = 1;i < N_WAVE/4 -1;i++) {
+			dat[i] = (rec.fft[i-1]+rec.fft[i]*2+rec.fft[i+1])/4;
+		}
+		
+		
+		  int cnt = 0;
+		  int maxCnt = 21;
+		  int maxOvertone = 50;
+		  int sp = 30;
+		  int pre2 = dat[sp-4];
+		  int pre1 = dat[sp-3];
+		  int peak = dat[sp-2];
+		  int af1  = dat[sp-1];
+		  int af2 = dat[sp];
+	
+		  int fftsource[] = new int[maxOvertone+1];
+		  int ffttarget[] = new int [maxOvertone+1];
+	
+		  for(int i = 0; i < maxOvertone+1;i++) {
+			  fftsource[i] = 0;
+	
+		  }
+	
+		  int ave = 0;
+		  //int base = 49;  //C4固定時
+		  int base = 0;
+		  int clip = 40;
+		  String strdat;
+		  int overtones;
+	
+		  cnt = 0;
+		  strdat = "";
+		  int peakData;
+		  for(int i = sp+1 ; i < N_WAVE/4-4;i++) {
+	
+			   pre2 = dat[i-4];
+			   pre1 = dat[i-3];
+			   peak = dat[i-2];
+			   af1  = dat[i-1];
+			   af2 = dat[i];
+	
+	
+			  ave = (pre2  + af2)/2;
+	
+			  if(pre1 >= peak) continue;
+			  if(af1 >  peak) continue;
+	
+			  if(af1  < af2 )continue;
+			  if(pre1 < pre2)continue;
+	
+			  if(peak < ave +3)continue;
+	
+			  if(i > 100)clip = 35;
+			  if(i > 150) clip = 30;
+			  if( i > 200)clip = 5;
+			  if( i > 400)clip = 3;
+	
+			  if(peak > clip) {
+				  if(base == 0) {
+					  base = i -2;
+				  }
+	
+				  cnt++;
+				  overtones = (int)((i-2.0)/base+0.5);
+				  peakData = dat[i-2];
+	
+				  strdat = strdat +  overtones + "," + peakData + ",  ";
 
-  File file = new File("C:\\Users\\Keiji\\Desktop\\fftData\\fftdata.txt");
-  FileWriter filewriter = null;
+				 if(peakData >fftsource[overtones]) {
+					 fftsource[overtones] = peakData;
+				 }
+				 i += base / 3;
+	
+				  if(cnt > maxCnt) break;
+			  	}
+	
+		  }
+	
+	
+		  String filename = "H:\\fftDataH\\overtonedata2.txt";
+//		  String filename = "H:\\fftDataH\\fftdata-alg5.txt";
+		  
+		  File file = new File(filename);
+			BufferedReader br = null;
+		  try {
+			  br = new BufferedReader(new FileReader(file));
+		} catch (FileNotFoundException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+	
+		  int index;
+		  String line;
+		  String[] data;
+		  int alg;
+		  int mulop1,mulop2,mulop3,mulop4;
+		  int tlvop1,tlvop2,tlvop3,tlvop4;
+		  int fftDataVal;
+	
+	
+		  double miniDiff = 1000000;  //十分大きい数
+		  double fifthDiff = miniDiff;
+		  double difference = 0;
+		  int maxCompareOvertones = 20;
+	
+	
+		  int mop1 = 0,mop2=0,mop3=0,mop4 = 0,top1=0,top2=0,top3=0,top4=0;
+	
+		  candidate.clear();
+		  candidataVal = 0;
+		  
+		  try {
+			while((line = br.readLine()) != null){
+				
+				  for(int i = 0; i < maxOvertone+1;i++) {
+					  ffttarget[i] = 0;
+				  }
+
+				  data = line.split(",");				  
+				  alg    = Integer.parseInt(data[0].trim());
+				  mulop1 = Integer.parseInt(data[1].trim());
+				  mulop2 = Integer.parseInt(data[2].trim());
+				  mulop3 = Integer.parseInt(data[3].trim());
+				  mulop4 = Integer.parseInt(data[4].trim());
+	
+				  tlvop1 = Integer.parseInt(data[5].trim());
+				  tlvop2 = Integer.parseInt(data[6].trim());
+				  tlvop3 = Integer.parseInt(data[7].trim());
+				  tlvop4 = Integer.parseInt(data[8].trim());
+	
+				  fftDataVal = Integer.parseInt(data[9].trim());
+	
+	
+				  for(int i = 10;i < fftDataVal * 2 + 10;i+=2) {
+					  index = Integer.parseInt(data[i].trim());
+					  ffttarget[index] = Integer.parseInt(data[i+1].trim());
+	
+				  }
+	
+	
+	
+				  // 比較ルーチン
+
+				  difference = 0;
+	
+				  double targetTotal,sourceTotal,mag;
+				  targetTotal = 0;
+				  sourceTotal = 0;
+				  
+				  for(int i = 1;i <= maxCompareOvertones;i++) {
+					  targetTotal += ffttarget[i];
+					  sourceTotal += fftsource[i];
+				  }
+				  
+				  mag = targetTotal/sourceTotal;
+				  for(int i =1;i<=maxCompareOvertones;i++) {
+					  difference += Math.abs( ffttarget[i]/mag - fftsource[i]);
+				  }
+	
+				  if(difference < fifthDiff) {
+	
+						OpeCandi newdata = new OpeCandi();
+						newdata.difference = difference;
+						
+						newdata.alg = alg;
+						newdata.mulop1 = mulop1;
+						newdata.mulop2 = mulop2;
+						newdata.mulop3 = mulop3;
+						newdata.mulop4 = mulop4;
+	
+						newdata.tlvop1 = tlvop1;
+						newdata.tlvop2 = tlvop2;
+						newdata.tlvop3 = tlvop3;
+						newdata.tlvop4 = tlvop4;
+	
+						candidate.add(newdata);
+						Collections.sort(
+								candidate,
+								new Comparator<OpeCandi>() {
+							@Override
+							public int compare(OpeCandi obj1 ,OpeCandi obj2) {
+								return (int)(obj1.difference - obj2.difference);
+							}
+						});
+	
+					  if(candidataVal < 5) {
+	
+						candidataVal++;
+						fifthDiff = candidate.get(candidate.size()-1).difference;
+						miniDiff = candidate.get(0).difference;
+					}else {
+						fifthDiff = candidate.get(4).difference;
+						miniDiff = candidate.get(0).difference;
+						candidate.remove(5);
+	
+					}
+	
+	
+					  System.out.printf("%4d  ", (int)difference);
+					  for(int i = 1; i <= maxCompareOvertones;i++) {
+						  System.out.printf("%4d,", (int)(ffttarget[i]/mag));
+					  }
+					  System.out.println("");
+					  miniDiff = difference;
+				  }
+	
+	
+			}
+			System.out.print("\n      ");
+			for(int i = 1; i < maxCnt;i++) {
+				System.out.printf("%4d," , fftsource[i]);
+			}
+			System.out.println("");
+	
+	
+	
+	
+			for(int i = 0; i < 5;i++) {
+				System.out.printf("%3d - %3d,%3d,%3d,%3d  %3d,%3d,%3d,%3d\n",
+						candidate.get(i).alg,
+						candidate.get(i).mulop1,
+						candidate.get(i).mulop2,
+						candidate.get(i).mulop3,
+						candidate.get(i).mulop4,
+	
+						candidate.get(i).tlvop1,
+						candidate.get(i).tlvop2,
+						candidate.get(i).tlvop3,
+						candidate.get(i).tlvop4
+						);
+			}
+			
+			opIndex = 0;
+			setOpTlData(0,opIndex);
+	
+	
+	
+		  } catch (IOException e) {
+			  // TODO 自動生成された catch ブロック
+			  e.printStackTrace();
+		  }
+	
+	
+		  try {
+			  br.close();
+		  } catch (IOException e) {
+			  // TODO 自動生成された catch ブロック
+			  e.printStackTrace();
+		  }
+	
+	
+	
+	}
+
+	
+	
+
+//------------------------------   fft照合データの作成保存 --------------------------
+	
+	
+	@FXML void fftDataWrite() {  
+	
+	
+		int fftalg = 4; //アルゴリズム
+		
+		
+		int maxCnt = 40;
+	
+	
+		int opMaxVal = 5;
+		int opTlMax = 60;
+		int opTlMin = 10;
+		int opTlStep = 2;
+	
+	
+	/* test operator set */
+	opMaxVal = 9;
+	opTlMax = 56;
+	opTlMin = 16;
+	opTlStep = 4;
+	
+	opMaxVal = 9;
+	opTlMax = 48;
+	opTlMin = 20;
+	opTlStep = 4;
+	
+	
+	opMaxVal = 5;
+	opTlMax = 50;
+	opTlMin = 38;
+	opTlStep = 4;
+	
+		int fftop1mul = 1;   //開始オペレータの初期値
+		int fftop2mul = 1;
+		int fftop3mul = 1;
+		int fftop4mul = 1;
+	
+		int fftTl1 = opTlMax;
+		int fftTl2 = opTlMax;
+		int fftTl3 = opTlMax;
+		int fftTl4 = 0;
+	
+	
+	
+	
+	Ymf825ToneData  toneData;
+	
+		toneData = Ymf825ToneData.getInstance();
+		toneData.setValue(eventSource.Connect, 0, 0, fftalg);
+	
+		String strpara;
+		fftTl1 = opTlMax + opTlStep;
+	while(true) {
+
+// alg =4 data 		
+
+		fftTl1 -= opTlStep;
+		if(fftTl1 < opTlMin) {
+	
+			fftTl1 = opTlMax;
+			fftTl2 -= opTlStep;
+			if(fftTl2 < opTlMin) {
+				fftTl2 = opTlMax;
+				fftTl3 -= opTlStep;
+				if(fftTl3 < opTlMin) {
+					fftTl3 = opTlMax;
+	
+	
+					fftop1mul++;
+					if(fftop1mul > opMaxVal) {
+						fftop1mul = 1;
+						fftop2mul++;
+						if(fftop2mul > opMaxVal) {
+							fftop2mul = 1;
+							fftop3mul++;
+						}
+					}
+				}
+			}
+		}
+		if(fftop3mul >opMaxVal)break;
+
+		
+//alg = 5 data
+/*		
+		fftTl3 -= opTlStep;
+		if(fftTl3 < opTlMin) {
+			
+			fftTl3 = opTlMax;
+			fftTl1 -= opTlStep;
+			if(fftTl1 < opTlMin) {
+				
+				fftTl1 = opTlMax;
+				fftTl2 -= opTlStep;
+				if(fftTl2 < opTlMin) {
+					fftTl2 = opTlMax;
+					
+					fftop3mul++;
+					if(fftop3mul > opMaxVal) {
+						fftop3mul = 1;
+						fftop1mul++;
+						if(fftop1mul > opMaxVal) {
+							fftop1mul = 1;
+							fftop2mul++;
+						}
+					}
+				}
+			}
+		}
+		if(fftop2mul >opMaxVal)break;
+*/
+		
+		
+		
+		
+		
+		
+		
+		strpara = String.format("%2d,%2d,%2d,%2d,%2d,  %2d,%2d,%2d,%2d,    ",
+				fftalg,
+				fftop1mul,fftop2mul,fftop3mul,fftop4mul,
+				fftTl1, fftTl2, fftTl3, fftTl4);
+	
+		toneData.setValue(eventSource.Mul, 0, 0, fftop1mul);
+		toneData.setValue(eventSource.Mul, 0, 1, fftop2mul);
+		toneData.setValue(eventSource.Mul, 0, 2, fftop3mul);
+		toneData.setValue(eventSource.Mul, 0, 3, fftop4mul);
+	
+		toneData.setValue(eventSource.Tlv, 0, 0, fftTl1);
+		toneData.setValue(eventSource.Tlv, 0, 1, fftTl2);
+		toneData.setValue(eventSource.Tlv, 0, 2, fftTl3);
+		toneData.setValue(eventSource.Tlv, 0, 3, fftTl4);
+	
+		byte [] tbuf = new byte[32];
+		toneData.get_tonememory(0, tbuf);
+		toneData.setTone(0,  tbuf);	  //値をPanelに標示
+	
+	
+	//System.out.println(strpara);
 	try {
-		filewriter = new FileWriter(file);
-	} catch (IOException e) {
+		Thread.sleep(500);
+	} catch (InterruptedException e1) {
 		// TODO 自動生成された catch ブロック
-		e.printStackTrace();
+		e1.printStackTrace();
 	}
-  BufferedWriter bw = new BufferedWriter(filewriter);
-
-  String str;
-  int d;
-  for(int i =0; i < N_WAVE/2;i++) {
-  	d = rec.fft[i];
-  	str =(Integer.valueOf(d).toString()+",");
-  	try {
-			bw.write(str);
-			bw.newLine();
+	
+		byte [] buf = new byte[4096*4];
+		AudioInput in = new AudioInput(audioRec2.audioBit,audioRec2.audioChannel,audioRec2.audioHz);
+		in.start();
+		in.read(buf);
+		in.stop();
+	
+		for(int i = 0;i < 4096*4;i++) {
+			audioRec2.audioBuf[i] = buf[i];
+		}
+		audioRec2.fttStartPos = 0;
+	
+		//waveFft(audioRec2, gfft2);
+		fftOnly(audioRec2, gfft2);
+		// data test save
+	
+	
+	
+	    //ノイズ除去
+		WaveRecord rec;
+		rec = audioRec2;
+		int dat[] = new int[N_WAVE/4];
+		for(int i = 1;i < N_WAVE/4 -1;i++) {
+			dat[i] = (rec.fft[i-1]+rec.fft[i]*2+rec.fft[i+1])/4;
+		}
+	
+	
+	  int cnt = 0;
+	
+	  int sp = 30;
+	  int pre2 = dat[sp-4];
+	  int pre1 = dat[sp-3];
+	  int peak = dat[sp-2];
+	  int af1  = dat[sp-1];
+	  int af2 = dat[sp];
+	
+	  int ave = 0;
+	  //int base = 49;  //C4固定時
+	  int base = 0;
+	  int clip = 40;
+	  String strdat;
+	
+	  cnt = 0;
+	  strdat = "";
+	  for(int i = sp+1 ; i < N_WAVE/4-4;i++) {
+	
+		   pre2 = dat[i-4];
+		   pre1 = dat[i-3];
+		   peak = dat[i-2];
+		   af1  = dat[i-1];
+		   af2 = dat[i];
+	
+	
+		  ave = (pre2  + af2)/2;
+	
+		  if(pre1 >= peak) continue;
+		  if(af1 >  peak) continue;
+	
+		  if(af1  < af2 )continue;
+		  if(pre1 < pre2)continue;
+	
+		  if(peak < ave +3)continue;
+	
+		  if(i > 100)clip = 35;
+		  if(i > 150) clip = 30;
+		  if( i > 200)clip = 5;
+		  if( i > 400)clip = 3;
+	
+		  if(peak > clip) {
+			  if(base == 0) {
+				  base = i -2;
+			  }
+	
+			  cnt++;
+	
+			 // System.out.print("(" + (i-2) + ")" + (int)((i-2.0)/base+0.5) + ",");
+			 // System.out.print((int)((i-2.0)/base+0.5) + "(" + dat[i-2] + "),");
+			 // System.out.print((int)((i-2.0)/base+0.5) +  ",");
+	
+			 strdat = strdat +  (int)((i-2.0)/base+0.5) + "," + dat[i-2] + ",  ";
+			 i += base / 3;
+	
+			  if(cnt > maxCnt) break;
+		  	}
+	
+	  }
+	
+	
+	
+	  if(cnt == maxCnt){
+		  fftTl1 = opTlMin ;
+		  if(fftTl2 == opTlMax) {
+			  fftTl2 = opTlMin;
+		  }
+	  }
+	  if(cnt <4) {
+		  fftTl1 -= opTlStep * 2 ;
+	  }
+	
+	  if(cnt >3 && cnt <= maxCnt) {
+		//ファイルへデータ追加
+	
+	
+	
+	System.out.println(strpara + cnt + " , " + strdat);
+	
+	
+	  String strf;
+	  int d;
+	  File file = new File("H:\\fftDataH\\fftdata.txt");
+	  FileWriter filewriter = null;
+		try {
+			filewriter = new FileWriter(file,true);  //上書き
 		} catch (IOException e) {
 			// TODO 自動生成された catch ブロック
 			e.printStackTrace();
 		}
-
-  }
-
-  try {
-		bw.close();
-		System.out.println("file close");
-	} catch (IOException e) {
-		// TODO 自動生成された catch ブロック
-		e.printStackTrace();
-	}
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-void drawFft(GraphicsContext g, int data[],int fftMag) {
-	g.clearRect(0, 0, 530, 400);
-	int offset = 4;
-	int a,b;
-
-	for(int i = 1;i < (N_WAVE-FFTviewStep-offset);i+= FFTviewStep) {
-
-		if(data[i+offset] > data[i+offset+1]) {
-			a = data[i+offset];
-		}else {
-			a = data[i+offset+1];
-		}
-		if(data[i+offset+2] > data[i+offset+3]) {
-			b = data[i+offset+2];
-		}else {
-			b = data[i+offset+3];
-		}
-		if(a < b) {
-			a = b;
-		}
-a = (int) Math.sqrt((double)a * fftMag);
-if(a > 175) a = 175;
-	double c = Math.sqrt(a);
-	g.setStroke(new Color(c/13.3,0,(13.3-c)/13.3,1));
-
-
-    	g.strokeLine(5+i/FFTviewStep, 175- a, 5+i/FFTviewStep, 175);
-
-	}
-	g.setStroke(Color.BLACK);
-}
-
-void waveFft(WaveRecord rec, GraphicsContext g) {
-	int [] source = new int[N_WAVE];
-	int [] target = new int[N_WAVE];
-	byte[]  buf = rec.audioBuf;
-	int pos = rec.fttStartPos;
-	int fftPosStep = 5;
-	int data;
-	for(int i = 0;i < N_WAVE; i++) {
-		 data = ( (int)(buf[pos*2+i*FFTsampringMag+1] <<8) | (0x00ff & buf[pos*2+i*FFTsampringMag]));
-//data >>= 3;
-		source[i] = data;
-		target[i] = 0;
-
-
-	}
-		runFFT = new RunFFT();
-		runFFT.start(source,target);
-	//fix_fft2(source,target);
-
-    	int j,k;
-    for (int i = 0; i <  (N_WAVE/2) ; i++) {
-
-        j = source[i];
-        k = target[i] ;
-        rec.fft[i] =(int) Math.sqrt(j*j+k*k);
-    }
-    drawFft(g,rec.fft,rec.fftYMag);
-
-
-
-//    // data test save
-//
-//    File file = new File("C:\\Users\\Keiji\\Desktop\\fftData\\fftdata.txt");
-//    FileWriter filewriter = null;
-//	try {
-//		filewriter = new FileWriter(file);
-//	} catch (IOException e) {
-//		// TODO 自動生成された catch ブロック
-//		e.printStackTrace();
-//	}
-//    BufferedWriter bw = new BufferedWriter(filewriter);
-//
-//    String str;
-//    int d;
-//    for(int i =0; i < N_WAVE/2;i++) {
-//    	d = rec.fft[i];
-//    	str =(Integer.valueOf(d).toString()+",");
-//    	try {
-//			bw.write(str);
-//			bw.newLine();
-//		} catch (IOException e) {
-//			// TODO 自動生成された catch ブロック
-//			e.printStackTrace();
-//		}
-//
-//    }
-//
-//    try {
-//		bw.close();
-//		System.out.println("file close");
-//	} catch (IOException e) {
-//		// TODO 自動生成された catch ブロック
-//		e.printStackTrace();
-//	}
-
-}
-
-
-void waveFft2(WaveRecord rec,GraphicsContext g) {
-	int [] source = new int[N_WAVE];
-	int [] target = new int[N_WAVE];
-	byte[]  buf = rec.audioBuf;
-	int pos = 0;
-	int data;
-	g.clearRect(0, 0, 530, 400);
-
-	runFFT = new RunFFT();
-
-
-	for(int ypos =0; ypos < 175;ypos++) {
-
-		// データ転送
-		for(int i = 0;i < N_WAVE; i++) {
-			data = ( (int)(buf[pos*2+i*FFTsampringMag+1] <<8) | (0x00ff & buf[pos*2+i*FFTsampringMag]));
-			source[i] = data;
-			target[i] = 0;
-		}
-		while(runFFT.isAlive()) {
-			;
-		}
-		runFFT = new RunFFT();
-		runFFT.start(source,target);
-    	int j,k;
-    	for (int i = 0; i <  (N_WAVE/2) ; i++) {
-
-    		j = source[i];
-    		k = target[i] ;
-    		source[i] =(int) Math.sqrt(j*j+k*k);
-    	}
-
-
-    	int a,b,c,d,max,offset;
-    	offset = 0;
-
-    	try {
-			runFFT.join();
-		} catch (InterruptedException e) {
+	  BufferedWriter bw = new BufferedWriter(filewriter);
+	
+	
+	
+	  	strf =strpara + cnt + " , " + strdat;
+	  	try {
+				bw.write(strf);
+				bw.newLine();
+			} catch (IOException e) {
+				// TODO 自動生成された catch ブロック
+				e.printStackTrace();
+			}
+	
+	
+	  try {
+			bw.close();
+		} catch (IOException e) {
 			// TODO 自動生成された catch ブロック
 			e.printStackTrace();
 		}
-
-
-    	for(int i = 1;i < (N_WAVE / 2 -FFTviewStep-offset);i+= FFTviewStep) {
-
-			max = source[i+offset];
-			b = source[i+offset+1];
-			c = source[i+offset+2];
-			d = source[i+offset+3];
-
-			if( max > b) {
-				if(max > c) {
-					if(max <d)
-						max = d;
-				}else {
-					if(c > d) {
-						max = c;
-					}else {
-						max = d;
-					}
-				}
-			}else {
-				if(b > c) {
-					if(b > d) {
-						max = b;
-					}else {
-						max = d;
-					}
-				}else {
-					if(c > d) {
-						max = c;
-					}else {
-						max = d;
-					}
-				}
-
-			}
-
-
-    		int index = max * rec.fftYMag;
-			if(index > 30624) {
-				index = 30624;
-			}
-
-		 	a = (int) drawSqrtTable[index];
-
-			// Line Draw
-
-			//double c = Math.sqrt(max);
-			double cl = (double)colorSqrtTable[a];
-    		// = (int) Math.sqrt((double)a * rec.fftYMag);
-    		//if(a > 175) a = 175;
-
-    	//double c = Math.sqrt(a-20);
-
-    	g.setStroke(new Color( (cl/13.3)*(cl/13.3),cl/13.3/2,(13.3-cl)/13.3*(cl/13.3),1));
-		g.strokeLine(5+i/FFTviewStep, ypos, 5+i/FFTviewStep, ypos+1);
-
-
-    	}
-		pos += 400;
+	  } // if(cnt > 2)
+	
+	
+	
+	                  }  //while(true){の対
+	
 	}
-}
-
-
-
-
-class RunFFT extends Thread{
-
-	  public void start(int fr[],int fi[]) {
-
-		  fix_fft2( fr,  fi);
-
-	  }
 
 
 
 
 
 
-int fix_fft2(int fr[], int fi[])
-{
-
-  int m, mr,  i, j, l, k, istep;
-  int qr, qi, tr, ti, wr, wi;
-
-  mr = 0;
-
-  /* decimation in time - re-order data */
-  for (m = 1; m <=(N_WAVE-1); ++m) {
-    l = N_WAVE;
-    do {
-      l >>= 1;
-    } while (mr + l >(N_WAVE -1));
-    mr = (mr & (l - 1)) + l;
-
-    if (mr <= m)
-      continue;
-    tr = fr[m];
-    fr[m] = fr[mr];
-    fr[mr] = tr;
-    ti = fi[m];
-    fi[m] = fi[mr];
-    fi[mr] = ti;
-  }
-
-  l = 1;
-  k = LOG2_N_WAVE - 1;
-  while (l < N_WAVE) {
-
-      /*
-        fixed scaling, for proper normalization --
-        there will be log2(n) passes, so this results
-        in an overall factor of 1/n, distributed to
-        maximize arithmetic accuracy.
-      */
 
 
-    /*
-      it may not be obvious, but the shift will be
-      performed on each data point exactly once,
-      during this pass.
-    */
-    istep = l << 1;
-    for (m = 0; m < l; ++m) {
-      j = m << k;
-      /* 0 <= j < N_WAVE/2 */
-      wr =  SineWaveN_WAVE2 [ j + N_WAVE / 4];
-
-      wi = -SineWaveN_WAVE2[j];
 
 
-      wr >>= 1;
-      wi >>= 1;
-
-      for (i = m; i < N_WAVE; i += istep) {
-        j = i + l;
 
 
-        tr = (wr * fr[j] - wi * fi[j] + 64 ) >> 10;
-        ti = (wr * fi[j] + wi * fr[j] + 64 ) >> 10;
+
+	void drawFft(GraphicsContext g, int data[],int fftMag) {
+		g.clearRect(0, 0, 530, 400);
+		int offset = 4;
+		int a,b;
+	
+		for(int i = 1;i < (N_WAVE-FFTviewStep-offset);i+= FFTviewStep) {
+	
+			if(data[i+offset] > data[i+offset+1]) {
+				a = data[i+offset];
+			}else {
+				a = data[i+offset+1];
+			}
+			if(data[i+offset+2] > data[i+offset+3]) {
+				b = data[i+offset+2];
+			}else {
+				b = data[i+offset+3];
+			}
+			if(a < b) {
+				a = b;
+			}
+	a = (int) Math.sqrt((double)a * fftMag);
+	if(a > 175) a = 175;
+		double c = Math.sqrt(a);
+		g.setStroke(new Color(c/13.3,0,(13.3-c)/13.3,1));
+	
+	
+	    	g.strokeLine(5+i/FFTviewStep, 175- a, 5+i/FFTviewStep, 175);
+	
+		}
+		g.setStroke(Color.BLACK);
+	}
+
+	void waveFft(WaveRecord rec, GraphicsContext g) {
+		int [] source = new int[N_WAVE];
+		int [] target = new int[N_WAVE];
+		byte[]  buf = rec.audioBuf;
+		int pos = rec.fttStartPos;
+		int fftPosStep = 5;
+		int data;
+		for(int i = 0;i < N_WAVE; i++) {
+			 data = ( (int)(buf[pos*2+i*FFTsampringMag+1] <<8) | (0x00ff & buf[pos*2+i*FFTsampringMag]));
+	//data >>= 3;
+			source[i] = data;
+			target[i] = 0;
+	
+	
+		}
+			runFFT = new RunFFT();
+			runFFT.start(source,target);
+		//fix_fft2(source,target);
+	
+	    	int j,k;
+	    for (int i = 0; i <  (N_WAVE/2) ; i++) {
+	
+	        j = source[i];
+	        k = target[i] ;
+	        rec.fft[i] =(int) Math.sqrt(j*j+k*k);
+	    }
+	    drawFft(g,rec.fft,rec.fftYMag);
+	
+	
+	
+	
+	
+	}
+
+/* データセット作成時のFFT処理のみ */
+
+	void fftOnly(WaveRecord rec, GraphicsContext g) {
+		int [] source = new int[N_WAVE];
+		int [] target = new int[N_WAVE];
+		byte[]  buf = rec.audioBuf;
+		int pos = rec.fttStartPos;
+		int fftPosStep = 5;
+		int data;
+		for(int i = 0;i < N_WAVE; i++) {
+			 data = ( (int)(buf[pos*2+i*FFTsampringMag+1] <<8) | (0x00ff & buf[pos*2+i*FFTsampringMag]));
+	//data >>= 3;
+			source[i] = data;
+			target[i] = 0;
+	
+	
+		}
+			runFFT = new RunFFT();
+			runFFT.start(source,target);
+		//fix_fft2(source,target);
+	
+	    	int j,k;
+	    for (int i = 0; i <  (N_WAVE/2) ; i++) {
+	
+	        j = source[i];
+	        k = target[i] ;
+	        rec.fft[i] =(int) Math.sqrt(j*j+k*k);
+	    }
+	
+	
+	
+	
+	
+	
+	}
 
 
-      	qr = fr[i];
-        qi = fi[i];
+	void waveFft2(WaveRecord rec,GraphicsContext g) {
+		int [] source = new int[N_WAVE];
+		int [] target = new int[N_WAVE];
+		byte[]  buf = rec.audioBuf;
+		int pos = 0;
+		int data;
+		g.clearRect(0, 0, 530, 400);
+	
+		runFFT = new RunFFT();
+	
+	
+		for(int ypos =0; ypos < 175;ypos++) {
+	
+			// データ転送
+			for(int i = 0;i < N_WAVE; i++) {
+				data = ( (int)(buf[pos*2+i*FFTsampringMag+1] <<8) | (0x00ff & buf[pos*2+i*FFTsampringMag]));
+				source[i] = data;
+				target[i] = 0;
+			}
+			while(runFFT.isAlive()) {
+				;
+			}
+			runFFT = new RunFFT();
+			runFFT.start(source,target);
+	    	int j,k;
+	    	for (int i = 0; i <  (N_WAVE/2) ; i++) {
+	
+	    		j = source[i];
+	    		k = target[i] ;
+	    		source[i] =(int) Math.sqrt(j*j+k*k);
+	    	}
+	
+	
+	    	int a,b,c,d,max,offset;
+	    	offset = 0;
+	
+	    	try {
+				runFFT.join();
+			} catch (InterruptedException e) {
+				// TODO 自動生成された catch ブロック
+				e.printStackTrace();
+			}
+	
+	
+	    	for(int i = 1;i < (N_WAVE / 2 -FFTviewStep-offset);i+= FFTviewStep) {
+	
+				max = source[i+offset];
+				b = source[i+offset+1];
+				c = source[i+offset+2];
+				d = source[i+offset+3];
+	
+				if( max > b) {
+					if(max > c) {
+						if(max <d)
+							max = d;
+					}else {
+						if(c > d) {
+							max = c;
+						}else {
+							max = d;
+						}
+					}
+				}else {
+					if(b > c) {
+						if(b > d) {
+							max = b;
+						}else {
+							max = d;
+						}
+					}else {
+						if(c > d) {
+							max = c;
+						}else {
+							max = d;
+						}
+					}
+	
+				}
+	
+	
+	    		int index = max * rec.fftYMag;
+				if(index > 30624) {
+					index = 30624;
+				}
+	
+			 	a = (int) drawSqrtTable[index];
+	
+				// Line Draw
+	
+				//double c = Math.sqrt(max);
+				double cl = (double)colorSqrtTable[a];
+	    		// = (int) Math.sqrt((double)a * rec.fftYMag);
+	    		//if(a > 175) a = 175;
+	
+	    	//double c = Math.sqrt(a-20);
+	
+	    	g.setStroke(new Color( (cl/13.3)*(cl/13.3),cl/13.3/2,(13.3-cl)/13.3*(cl/13.3),1));
+			g.strokeLine(5+i/FFTviewStep, ypos, 5+i/FFTviewStep, ypos+1);
+	
+	
+	    	}
+			pos += 400;
+		}
+	}
 
-        qr >>= 1;
-        qi >>= 1;
 
-        fr[j] = qr - tr;
-        fi[j] = qi - ti;
-        fr[i] = qr + tr;
-        fi[i] = qi + ti;
-      }
-    }
-    --k;
-    l = istep;
-  }
-  return 0;
-}
 
-}
+
+	class RunFFT extends Thread{
+	
+		public void start(int fr[],int fi[]) {
+	
+			fix_fft2( fr,  fi);
+	
+		  }
+	
+	
+	
+	
+		int fix_fft2(int fr[], int fi[])
+		{
+		
+		  int m, mr,  i, j, l, k, istep;
+		  int qr, qi, tr, ti, wr, wi;
+		
+		  mr = 0;
+		
+		  /* decimation in time - re-order data */
+		  for (m = 1; m <=(N_WAVE-1); ++m) {
+		    l = N_WAVE;
+		    do {
+		      l >>= 1;
+		    } while (mr + l >(N_WAVE -1));
+		    mr = (mr & (l - 1)) + l;
+		
+		    if (mr <= m)
+		      continue;
+		    tr = fr[m];
+		    fr[m] = fr[mr];
+		    fr[mr] = tr;
+		    ti = fi[m];
+		    fi[m] = fi[mr];
+		    fi[mr] = ti;
+		  }
+		
+		  l = 1;
+		  k = LOG2_N_WAVE - 1;
+		  while (l < N_WAVE) {
+		
+		      /*
+		        fixed scaling, for proper normalization --
+		        there will be log2(n) passes, so this results
+		        in an overall factor of 1/n, distributed to
+		        maximize arithmetic accuracy.
+		      */
+		
+		
+		    /*
+		      it may not be obvious, but the shift will be
+		      performed on each data point exactly once,
+		      during this pass.
+		    */
+		    istep = l << 1;
+		    for (m = 0; m < l; ++m) {
+		      j = m << k;
+		      /* 0 <= j < N_WAVE/2 */
+		      wr =  SineWaveN_WAVE2 [ j + N_WAVE / 4];
+		
+		      wi = -SineWaveN_WAVE2[j];
+		
+		
+		      wr >>= 1;
+		      wi >>= 1;
+		
+		      for (i = m; i < N_WAVE; i += istep) {
+		        j = i + l;
+		
+		
+		        tr = (wr * fr[j] - wi * fi[j] + 64 ) >> 10;
+		        ti = (wr * fi[j] + wi * fr[j] + 64 ) >> 10;
+		
+		
+		      	qr = fr[i];
+		        qi = fi[i];
+		
+		        qr >>= 1;
+		        qi >>= 1;
+		
+		        fr[j] = qr - tr;
+		        fi[j] = qi - ti;
+		        fr[i] = qr + tr;
+		        fi[i] = qi + ti;
+		      }
+		    }
+		    --k;
+		    l = istep;
+		  }
+		  return 0;
+		}
+	}
+
+
+
 
 }
